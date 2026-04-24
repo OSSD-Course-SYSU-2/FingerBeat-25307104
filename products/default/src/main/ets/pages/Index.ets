@@ -2,6 +2,8 @@
  * Index is the entry of application.
  * Main menu page with app title and start button.
  */
+import router from '@ohos.router';
+
 @Entry
 @Component
 struct Index {
@@ -16,6 +18,9 @@ struct Index {
         .fontSize(18)
         .width('60%')
         .height(48)
+        .onClick(() => {
+          router.pushUrl({ url: 'pages/GamePage' });
+        })
     }
     .width('100%')
     .height('100%')

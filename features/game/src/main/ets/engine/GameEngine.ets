@@ -16,10 +16,9 @@ import {
 } from '../model/GameTypes';
 import {
   GAME_LOOP_INTERVAL,
-  JUDGMENT_WINDOWS,
-  DIFFICULTY_SPEED_MULTIPLIER,
   BASE_SCROLL_SPEED,
   JUDGMENT_LINE_RATIO,
+  gameConstants,
 } from '../constants/GameConstants';
 import { Logger } from '@ohos/common';
 import JudgeSystem from './JudgeSystem';
@@ -51,10 +50,6 @@ class GameEngine {
 
   /**
    * Start the game: initialize all subsystems, load beatmap, play BGM, start game loop.
-   * @param config - Game configuration
-   * @param context - Ability context for resource access
-   * @param uiUpdater - UI update callback interface
-   * @param screenHeight - Screen height in px
    */
   async start(config: GameConfig, context: Context, uiUpdater: GameUIUpdater, screenHeight: number): Promise<void> {
     try {
@@ -73,8 +68,7 @@ class GameEngine {
       }
 
       // Setup judgment windows
-      const diffKey = `${config.difficulty}`;
-      const windowsConfig = JUDGMENT_WINDOWS[diffKey];
+      const windowsConfig = gameConstants.getJudgmentWindows(config.difficulty);
       this.judgmentWindows = {
         perfectWindow: windowsConfig.perfect,
         greatWindow: windowsConfig.great,
@@ -85,7 +79,7 @@ class GameEngine {
       this.judgeSystem = new JudgeSystem(this.judgmentWindows);
       this.scoreSystem = new ScoreSystem(beatmap.notes.length);
 
-      const scrollSpeed = BASE_SCROLL_SPEED * config.scrollSpeed * (DIFFICULTY_SPEED_MULTIPLIER[diffKey] ?? 1.0);
+      const scrollSpeed = BASE_SCROLL_SPEED * config.scrollSpeed * gameConstants.getDifficultySpeedMultiplier(config.difficulty);
       const judgmentLineY = screenHeight * JUDGMENT_LINE_RATIO;
       this.noteScheduler = new NoteScheduler(scrollSpeed, judgmentLineY);
       this.noteScheduler.loadNotes(beatmap.notes);
@@ -142,12 +136,12 @@ class GameEngine {
 
     // Check for missed notes
     if (this.noteScheduler !== null && this.judgeSystem !== null && this.scoreSystem !== null) {
-      const goodWindow = this.judgmentWindows?.goodWindow ?? 150;
+      const goodWindow = this.judgmentWindows !== null ? this.judgmentWindows.goodWindow : 150;
       const missedIds = this.noteScheduler.checkMissedNotes(currentTime, goodWindow);
 
       for (const noteId of missedIds) {
         const increment = this.scoreSystem.onJudgment(JudgmentGrade.MISS);
-        gameEventBus.emit(GameEventType.NOTE_MISSED, { noteId: noteId });
+        gameEventBus.emit(GameEventType.NOTE_MISSED);
 
         if (this.uiUpdater !== null) {
           this.uiUpdater.onJudgmentShow(JudgmentGrade.MISS, -1);
@@ -170,7 +164,6 @@ class GameEngine {
 
   /**
    * Handle lane tap: find nearest note → judge → score → SFX → callback UI.
-   * @param laneIndex - The lane index that was tapped
    */
   onLaneTap(laneIndex: number): void {
     if (this.state !== GameState.PLAYING) {
@@ -181,7 +174,7 @@ class GameEngine {
     }
 
     const currentTime = this.getCurrentTime();
-    const goodWindow = this.judgmentWindows?.goodWindow ?? 150;
+    const goodWindow = this.judgmentWindows !== null ? this.judgmentWindows.goodWindow : 150;
 
     // Find nearest unjudged TAP note in this lane
     const nearestNote = this.judgeSystem.findNearestNote(
@@ -211,18 +204,9 @@ class GameEngine {
     }
 
     // Emit events
-    gameEventBus.emit(GameEventType.NOTE_JUDGED, {
-      grade: grade,
-      noteId: nearestNote.id,
-      timeOffset: timeOffset,
-    });
-    gameEventBus.emit(GameEventType.SCORE_UPDATED, {
-      score: this.scoreSystem.getScore(),
-      increment: increment,
-    });
-    gameEventBus.emit(GameEventType.COMBO_CHANGED, {
-      combo: this.scoreSystem.getCombo(),
-    });
+    gameEventBus.emit(GameEventType.NOTE_JUDGED);
+    gameEventBus.emit(GameEventType.SCORE_UPDATED);
+    gameEventBus.emit(GameEventType.COMBO_CHANGED);
 
     // Callback UI
     if (this.uiUpdater !== null) {
@@ -297,7 +281,7 @@ class GameEngine {
       this.uiUpdater.onGameEnd(result);
     }
 
-    gameEventBus.emit(GameEventType.GAME_ENDED, result !== null ? result : {});
+    gameEventBus.emit(GameEventType.GAME_ENDED);
     Logger.info('GameEngine.endGame: game ended');
   }
 
@@ -325,17 +309,14 @@ class GameEngine {
 
   /**
    * Get current game time in ms.
-   * Priority: AudioPlayer.getCurrentTime(), fallback: Date.now() - startTime - pauseDuration.
    */
   private getCurrentTime(): number {
-    // Try audio player first
     if (this.audioPlayer !== null) {
       const audioTime = this.audioPlayer.getCurrentTime();
       if (audioTime > 0) {
         return audioTime;
       }
     }
-    // Fallback to system clock
     return Date.now() - this.startTime - this.totalPauseDuration;
   }
 

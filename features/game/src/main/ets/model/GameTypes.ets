@@ -234,15 +234,4 @@ export abstract class GameUIUpdater {
 }
 
 // ==================== Type Helpers ====================
-
-export class GameTypes {
-  static readonly GameState = GameState;
-  static readonly JudgmentGrade = JudgmentGrade;
-  static readonly LetterGrade = LetterGrade;
-  static readonly Difficulty = Difficulty;
-  static readonly NoteType = NoteType;
-  static readonly SongSource = SongSource;
-  static readonly GameEventType = GameEventType;
-  static readonly GameMode = GameMode;
-  static readonly RoomStatus = RoomStatus;
-}
+// Enums are already exported above with `export enum`. No re-export needed.

@@ -4,7 +4,7 @@
  */
 
 import { JudgmentGrade, LetterGrade, GameResult } from '../model/GameTypes';
-import { SCORE_WEIGHTS, COMBO_MULTIPLIERS, LETTER_GRADE_THRESHOLDS } from '../constants/GameConstants';
+import { COMBO_MULTIPLIERS, gameConstants } from '../constants/GameConstants';
 import { Logger } from '@ohos/common';
 
 class ScoreSystem {
@@ -25,8 +25,6 @@ class ScoreSystem {
 
   /**
    * Process a judgment grade: update score with combo multiplier, update combo chain.
-   * @param grade - The judgment grade received
-   * @returns Score increment for this judgment
    */
   onJudgment(grade: JudgmentGrade): number {
     // Update judgment counts
@@ -44,7 +42,7 @@ class ScoreSystem {
     }
 
     // Calculate score increment with combo multiplier
-    const baseWeight = SCORE_WEIGHTS[`${grade}`] ?? 0;
+    const baseWeight = gameConstants.getScoreWeight(grade);
     const comboMultiplier = this.getComboMultiplier();
     const increment = Math.floor(baseWeight * comboMultiplier);
     this.score += increment;
@@ -55,13 +53,12 @@ class ScoreSystem {
 
   /**
    * Get current accuracy as percentage (0-100).
-   * Accuracy = totalScore / maxPossibleScore * 100
    */
   getAccuracy(): number {
     if (this.totalNoteCount === 0) {
       return 0;
     }
-    const maxPossibleScore = this.totalNoteCount * SCORE_WEIGHTS[`${JudgmentGrade.PERFECT}`];
+    const maxPossibleScore = this.totalNoteCount * gameConstants.getScoreWeight(JudgmentGrade.PERFECT);
     if (maxPossibleScore === 0) {
       return 0;
     }
@@ -86,30 +83,18 @@ class ScoreSystem {
     };
   }
 
-  /**
-   * Get current score.
-   */
   getScore(): number {
     return this.score;
   }
 
-  /**
-   * Get current combo.
-   */
   getCombo(): number {
     return this.combo;
   }
 
-  /**
-   * Get max combo.
-   */
   getMaxCombo(): number {
     return this.maxCombo;
   }
 
-  /**
-   * Calculate combo multiplier based on current combo.
-   */
   private getComboMultiplier(): number {
     for (const entry of COMBO_MULTIPLIERS) {
       if (this.combo >= entry.threshold) {
@@ -119,17 +104,14 @@ class ScoreSystem {
     return 1.0;
   }
 
-  /**
-   * Calculate letter grade based on accuracy percentage.
-   */
   private calculateLetterGrade(accuracy: number): LetterGrade {
-    if (accuracy >= LETTER_GRADE_THRESHOLDS[`${LetterGrade.S}`]) {
+    if (accuracy >= gameConstants.getLetterGradeThreshold(LetterGrade.S)) {
       return LetterGrade.S;
-    } else if (accuracy >= LETTER_GRADE_THRESHOLDS[`${LetterGrade.A}`]) {
+    } else if (accuracy >= gameConstants.getLetterGradeThreshold(LetterGrade.A)) {
       return LetterGrade.A;
-    } else if (accuracy >= LETTER_GRADE_THRESHOLDS[`${LetterGrade.B}`]) {
+    } else if (accuracy >= gameConstants.getLetterGradeThreshold(LetterGrade.B)) {
       return LetterGrade.B;
-    } else if (accuracy >= LETTER_GRADE_THRESHOLDS[`${LetterGrade.C}`]) {
+    } else if (accuracy >= gameConstants.getLetterGradeThreshold(LetterGrade.C)) {
       return LetterGrade.C;
     } else {
       return LetterGrade.D;

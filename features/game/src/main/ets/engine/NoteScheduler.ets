@@ -24,7 +24,12 @@ class NoteScheduler {
   loadNotes(noteDataList: NoteData[]): void {
     this.notes = noteDataList.map((noteData: NoteData): RuntimeNote => {
       return {
-        ...noteData,
+        id: noteData.id,
+        lane: noteData.lane,
+        targetTime: noteData.targetTime,
+        type: noteData.type,
+        holdDuration: noteData.holdDuration,
+        endLane: noteData.endLane,
         currentY: 0,
         isJudged: false,
         isVisible: false,
