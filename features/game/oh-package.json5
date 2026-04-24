@@ -1,5 +1,5 @@
 {
-  "name": "game",
+  "name": "@ohos/game",
   "version": "1.0.0",
   "description": "FingerBeat game core module",
   "main": "Index.ets",
