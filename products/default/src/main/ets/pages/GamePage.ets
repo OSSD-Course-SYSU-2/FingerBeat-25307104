@@ -1,6 +1,6 @@
 /**
  * GamePage - FingerBeat game play page.
- * Renders the rhythm game using GameEngine with Canvas.
+ * Uses Canvas for game rendering with a separate draw timer.
  */
 import {
   GameEngine, GameUIUpdater, gameConstants,
@@ -12,12 +12,22 @@ import router from '@ohos.router';
 const LANE_COUNT: number = 4;
 const JUDGMENT_LINE_RATIO: number = 0.85;
 const NOTE_WIDTH_RATIO: number = 0.9;
-const NOTE_HEIGHT: number = 20;
+const NOTE_HEIGHT: number = 24;
+const DRAW_INTERVAL: number = 16; // ~60fps
 
 @Entry
 @Component
 struct GamePage {
   private engine: GameEngine = new GameEngine();
+  private ctx: CanvasRenderingContext2D = new CanvasRenderingContext2D(new RenderingContextSettings(true));
+  private w: number = 0;
+  private h: number = 0;
+  private laneW: number = 0;
+  private judgY: number = 0;
+  private drawTimerId: number = -1;
+  private gameStarted: boolean = false;
+  private canvasReady: boolean = false;
+  latestNotes: RuntimeNote[] = [];
 
   @State score: number = 0;
   @State combo: number = 0;
@@ -28,24 +38,24 @@ struct GamePage {
   @State endScore: number = 0;
   @State endAccuracy: number = 0;
   @State endMaxCombo: number = 0;
-  @State notes: RuntimeNote[] = [];
-
-  private canvasWidth: number = 0;
-  private canvasHeight: number = 0;
-  private laneWidth: number = 0;
-  private judgmentLineY: number = 0;
-  private context: CanvasRenderingContext2D = new CanvasRenderingContext2D(new RenderingContextSettings(true));
 
   aboutToDisappear(): void {
+    if (this.drawTimerId !== -1) {
+      clearInterval(this.drawTimerId);
+    }
     this.engine.quit();
   }
 
-  private startGame(): void {
-    const songId: string = 'song1';
-    const difficulty: Difficulty = Difficulty.Normal;
+  private tryStartGame(): void {
+    // Only start when both canvas is ready AND we have valid screen dimensions
+    if (this.gameStarted || !this.canvasReady || this.h === 0) {
+      return;
+    }
+    this.gameStarted = true;
+
     const config: GameConfig = {
-      songId: songId,
-      difficulty: difficulty,
+      songId: 'song1',
+      difficulty: Difficulty.Normal,
       laneCount: LANE_COUNT,
       scrollSpeed: gameConstants.DEFAULT_SETTINGS.scrollSpeed,
       musicVolume: gameConstants.DEFAULT_SETTINGS.musicVolume,
@@ -53,35 +63,100 @@ struct GamePage {
     };
 
     const uiUpdater: GameUIUpdaterImpl = new GameUIUpdaterImpl(this);
-    this.engine.start(config, getContext(this), uiUpdater, this.canvasHeight);
+    this.engine.start(config, getContext(this), uiUpdater, this.h);
+
+    // Start independent draw loop
+    this.drawTimerId = setInterval(() => {
+      this.draw();
+    }, DRAW_INTERVAL);
+  }
+
+  private draw(): void {
+    if (this.w === 0 || this.h === 0) {
+      return;
+    }
+
+    const c = this.ctx;
+    c.clearRect(0, 0, this.w, this.h);
+
+    // Background
+    c.fillStyle = '#0D0D1A';
+    c.fillRect(0, 0, this.w, this.h);
+
+    // Lane dividers
+    c.strokeStyle = '#333366';
+    c.lineWidth = 1;
+    for (let i = 1; i < LANE_COUNT; i++) {
+      const x = i * this.laneW;
+      c.beginPath();
+      c.moveTo(x, 0);
+      c.lineTo(x, this.h);
+      c.stroke();
+    }
+
+    // Judgment line
+    c.strokeStyle = '#FFFFFF';
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(0, this.judgY);
+    c.lineTo(this.w, this.judgY);
+    c.stroke();
+
+    // Notes
+    const noteW = this.laneW * NOTE_WIDTH_RATIO;
+    const noteOff = (this.laneW - noteW) / 2;
+    const notes = this.latestNotes;
+
+    for (let i = 0; i < notes.length; i++) {
+      const n = notes[i];
+      if (!n.isVisible) {
+        continue;
+      }
+
+      const x = n.lane * this.laneW + noteOff;
+      const y = n.currentY - NOTE_HEIGHT / 2;
+
+      if (n.type === NoteType.TAP) {
+        c.fillStyle = '#00BFFF';
+      } else if (n.type === NoteType.HOLD) {
+        c.fillStyle = '#FF6B6B';
+      } else {
+        c.fillStyle = '#FFD700';
+      }
+
+      c.globalAlpha = n.isJudged ? 0.3 : 1.0;
+      c.fillRect(x, y, noteW, NOTE_HEIGHT);
+      c.globalAlpha = 1.0;
+    }
   }
 
   build() {
     Stack() {
-      // Game canvas
-      Canvas(this.context)
+      // Canvas - renders the game field
+      Canvas(this.ctx)
         .width('100%')
         .height('100%')
         .onReady(() => {
-          this.startGame();
+          this.canvasReady = true;
+          this.tryStartGame();
         })
-        .onAreaChange((_oldArea: Area, newArea: Area) => {
-          this.canvasWidth = Number(newArea.width);
-          this.canvasHeight = Number(newArea.height);
-          this.laneWidth = this.canvasWidth / LANE_COUNT;
-          this.judgmentLineY = this.canvasHeight * JUDGMENT_LINE_RATIO;
+        .onAreaChange((_old: Area, newArea: Area) => {
+          this.w = Number(newArea.width);
+          this.h = Number(newArea.height);
+          this.laneW = this.w / LANE_COUNT;
+          this.judgY = this.h * JUDGMENT_LINE_RATIO;
+          this.tryStartGame();
         })
 
-      // HUD overlay
+      // HUD overlay - fully transparent, click-through
       Column() {
-        // Top bar: score + combo
+        // Score bar
         Row() {
           Text(`Score: ${this.score}`)
             .fontSize(20)
             .fontColor('#FFFFFF')
             .fontWeight(FontWeight.Bold)
-            .layoutWeight(1)
-
+          Blank()
           if (this.combo > 1) {
             Text(`${this.combo}x`)
               .fontSize(24)
@@ -92,7 +167,7 @@ struct GamePage {
         .width('100%')
         .padding({ left: 16, right: 16, top: 8 })
 
-        // Judgment display
+        // Judgment text
         if (this.judgmentText !== '') {
           Text(this.judgmentText)
             .fontSize(28)
@@ -103,29 +178,27 @@ struct GamePage {
 
         Blank()
 
-        // Lane tap zones
+        // Tap zones at bottom
         Row() {
-          ForEach(Array.from({ length: LANE_COUNT }, (_v: undefined, i: number) => i), (laneIndex: number) => {
+          ForEach(Array.from({ length: LANE_COUNT }, (_v: undefined, i: number) => i), (idx: number) => {
             Column()
               .width(`${100 / LANE_COUNT}%`)
               .height('100%')
-              .backgroundColor('#1A1A2E')
-              .borderWidth({ left: 0.5, right: 0.5 })
-              .borderColor('#333366')
               .onClick(() => {
                 if (!this.isPaused && !this.isEnded) {
-                  this.engine.onLaneTap(laneIndex);
+                  this.engine.onLaneTap(idx);
                 }
               })
-          }, (laneIndex: number) => `${laneIndex}`)
+          }, (idx: number) => `${idx}`)
         }
         .width('100%')
         .height('30%')
       }
       .width('100%')
       .height('100%')
+      .hitTestBehavior(HitTestMode.Transparent)
 
-      // Pause button
+      // Pause
       if (!this.isEnded) {
         Button(this.isPaused ? '继续' : '暂停')
           .fontSize(14)
@@ -143,7 +216,7 @@ struct GamePage {
           })
       }
 
-      // Result overlay
+      // Result
       if (this.isEnded) {
         Column() {
           Text('游戏结束')
@@ -151,22 +224,18 @@ struct GamePage {
             .fontColor('#FFFFFF')
             .fontWeight(FontWeight.Bold)
             .margin({ bottom: 16 })
-
           Text(`Score: ${this.endScore}`)
             .fontSize(24)
             .fontColor('#FFD700')
             .margin({ bottom: 8 })
-
           Text(`Accuracy: ${(this.endAccuracy * 100).toFixed(1)}%`)
             .fontSize(20)
             .fontColor('#FFFFFF')
             .margin({ bottom: 8 })
-
           Text(`Max Combo: ${this.endMaxCombo}`)
             .fontSize(20)
             .fontColor('#FFFFFF')
             .margin({ bottom: 24 })
-
           Button('返回主页')
             .fontSize(18)
             .width('60%')
@@ -183,70 +252,9 @@ struct GamePage {
     }
     .width('100%')
     .height('100%')
-    .backgroundColor('#0D0D1A')
-  }
-
-  /**
-   * Redraw the canvas with current notes.
-   */
-  renderNotes(notes: RuntimeNote[]): void {
-    const ctx = this.context;
-    ctx.clearRect(0, 0, this.canvasWidth, this.canvasHeight);
-
-    // Draw lane dividers
-    ctx.strokeStyle = '#333366';
-    ctx.lineWidth = 1;
-    for (let i = 1; i < LANE_COUNT; i++) {
-      const x = i * this.laneWidth;
-      ctx.beginPath();
-      ctx.moveTo(x, 0);
-      ctx.lineTo(x, this.canvasHeight);
-      ctx.stroke();
-    }
-
-    // Draw judgment line
-    ctx.strokeStyle = '#FFFFFF';
-    ctx.lineWidth = 2;
-    ctx.beginPath();
-    ctx.moveTo(0, this.judgmentLineY);
-    ctx.lineTo(this.canvasWidth, this.judgmentLineY);
-    ctx.stroke();
-
-    // Draw notes
-    const noteWidth = this.laneWidth * NOTE_WIDTH_RATIO;
-    const noteOffset = (this.laneWidth - noteWidth) / 2;
-
-    for (const note of notes) {
-      if (!note.isVisible) {
-        continue;
-      }
-      const x = note.lane * this.laneWidth + noteOffset;
-      const y = note.currentY - NOTE_HEIGHT / 2;
-
-      // Color by type
-      if (note.type === NoteType.TAP) {
-        ctx.fillStyle = '#00BFFF';
-      } else if (note.type === NoteType.HOLD) {
-        ctx.fillStyle = '#FF6B6B';
-      } else {
-        ctx.fillStyle = '#FFD700';
-      }
-
-      if (note.isJudged) {
-        ctx.globalAlpha = 0.3;
-      } else {
-        ctx.globalAlpha = 1.0;
-      }
-
-      ctx.fillRect(x, y, noteWidth, NOTE_HEIGHT);
-      ctx.globalAlpha = 1.0;
-    }
   }
 }
 
-/**
- * Concrete GameUIUpdater that delegates to GamePage state updates.
- */
 class GameUIUpdaterImpl extends GameUIUpdater {
   private page: GamePage;
 
@@ -256,8 +264,7 @@ class GameUIUpdaterImpl extends GameUIUpdater {
   }
 
   onNotesUpdate(notes: RuntimeNote[]): void {
-    this.page.notes = notes;
-    this.page.renderNotes(notes);
+    this.page.latestNotes = notes;
   }
 
   onScoreUpdate(score: number, _increment: number): void {
