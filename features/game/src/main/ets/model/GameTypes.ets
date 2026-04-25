@@ -230,7 +230,7 @@ export abstract class GameUIUpdater {
   abstract onScoreUpdate(score: number, increment: number): void;
   abstract onComboUpdate(combo: number): void;
   abstract onJudgmentShow(grade: JudgmentGrade, lane: number): void;
-  abstract onGameEnd(result: GameResult): void;
+  abstract onGameEnd(result: GameResult, bestScore: number, isNewRecord: boolean): void;
 }
 
 // ==================== Type Helpers ====================

@@ -14,7 +14,7 @@ struct Index {
         .fontWeight(FontWeight.Bold)
         .margin({ bottom: 24 })
 
-      Button('开始游戏')
+      Button($r('app.string.start_game'))
         .fontSize(18)
         .width('60%')
         .height(48)

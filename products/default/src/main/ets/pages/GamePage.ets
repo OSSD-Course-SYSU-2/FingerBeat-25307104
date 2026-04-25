@@ -38,6 +38,8 @@ struct GamePage {
   @State endScore: number = 0;
   @State endAccuracy: number = 0;
   @State endMaxCombo: number = 0;
+  @State endBestScore: number = 0;
+  @State endIsNewRecord: boolean = false;
 
   aboutToDisappear(): void {
     if (this.drawTimerId !== -1) {
@@ -228,6 +230,17 @@ struct GamePage {
             .fontSize(24)
             .fontColor('#FFD700')
             .margin({ bottom: 8 })
+          if (this.endIsNewRecord) {
+            Text('新纪录!')
+              .fontSize(18)
+              .fontColor('#FF4500')
+              .fontWeight(FontWeight.Bold)
+              .margin({ bottom: 8 })
+          }
+          Text(`Best: ${this.endBestScore}`)
+            .fontSize(20)
+            .fontColor('#AAAAAA')
+            .margin({ bottom: 8 })
           Text(`Accuracy: ${(this.endAccuracy * 100).toFixed(1)}%`)
             .fontSize(20)
             .fontColor('#FFFFFF')
@@ -280,10 +293,12 @@ class GameUIUpdaterImpl extends GameUIUpdater {
     this.page.judgmentColor = gameConstants.getJudgmentColor(grade);
   }
 
-  onGameEnd(result: GameResult): void {
+  onGameEnd(result: GameResult, bestScore: number, isNewRecord: boolean): void {
     this.page.isEnded = true;
     this.page.endScore = result.score;
     this.page.endAccuracy = result.accuracy;
     this.page.endMaxCombo = result.maxCombo;
+    this.page.endBestScore = bestScore;
+    this.page.endIsNewRecord = isNewRecord;
   }
 }

@@ -27,6 +27,7 @@ import NoteScheduler from './NoteScheduler';
 import AudioPlayer from './AudioPlayer';
 import { gameEventBus } from './GameEventBus';
 import BeatmapRepository from '../data/BeatmapRepository';
+import ScoreStore from '../data/ScoreStore';
 
 class GameEngine {
   // Subsystems
@@ -78,6 +79,9 @@ class GameEngine {
       // Initialize subsystems
       this.judgeSystem = new JudgeSystem(this.judgmentWindows);
       this.scoreSystem = new ScoreSystem(beatmap.notes.length);
+
+      // Initialize ScoreStore for best score persistence
+      ScoreStore.init(context);
 
       const scrollSpeed = BASE_SCROLL_SPEED * config.scrollSpeed * gameConstants.getDifficultySpeedMultiplier(config.difficulty);
       const judgmentLineY = screenHeight * JUDGMENT_LINE_RATIO;
@@ -278,7 +282,18 @@ class GameEngine {
     }
 
     if (this.uiUpdater !== null && result !== null) {
-      this.uiUpdater.onGameEnd(result);
+      // Save best score and check for new record
+      let bestScore: number = 0;
+      let isNewRecord: boolean = false;
+      if (this.config !== null) {
+        const existing = ScoreStore.getBestScore(this.config.songId, this.config.difficulty);
+        bestScore = existing !== null ? existing.score : 0;
+        isNewRecord = ScoreStore.updateBestScore(this.config.songId, this.config.difficulty, result);
+        if (isNewRecord) {
+          bestScore = result.score;
+        }
+      }
+      this.uiUpdater.onGameEnd(result, bestScore, isNewRecord);
     }
 
     gameEventBus.emit(GameEventType.GAME_ENDED);
