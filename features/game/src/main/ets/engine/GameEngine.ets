@@ -90,12 +90,14 @@ class GameEngine {
 
       this.audioPlayer = new AudioPlayer();
 
-      // Load and play BGM
-      const song = BeatmapRepository.getSongById(config.songId);
-      if (song !== null) {
-        await this.audioPlayer.initBGM(song.audioFilePath, context);
-        this.audioPlayer.setVolume(config.musicVolume);
-        await this.audioPlayer.playBGM();
+      // Load and play BGM (skip if hasBGM is false, e.g. practice mode)
+      if (config.hasBGM) {
+        const song = BeatmapRepository.getSongById(config.songId);
+        if (song !== null) {
+          await this.audioPlayer.initBGM(song.audioFilePath, context);
+          this.audioPlayer.setVolume(config.musicVolume);
+          await this.audioPlayer.playBGM();
+        }
       }
 
       // Record start time

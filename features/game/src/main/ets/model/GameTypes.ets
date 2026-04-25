@@ -106,6 +106,7 @@ export interface GameConfig {
   scrollSpeed: number;
   musicVolume: number;
   sfxVolume: number;
+  hasBGM: boolean;
 }
 
 export interface GameResult {

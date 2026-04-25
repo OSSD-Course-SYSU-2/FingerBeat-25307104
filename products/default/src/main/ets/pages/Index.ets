@@ -19,7 +19,7 @@ struct Index {
         .width('60%')
         .height(48)
         .onClick(() => {
-          router.pushUrl({ url: 'pages/GamePage' });
+          router.pushUrl({ url: 'pages/SongSelectPage' });
         })
     }
     .width('100%')

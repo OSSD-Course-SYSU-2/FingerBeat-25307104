@@ -55,13 +55,20 @@ struct GamePage {
     }
     this.gameStarted = true;
 
+    // Read params from router (passed from SongSelectPage)
+    const params = router.getParams() as Record<string, Object>;
+    const songId: string = params !== null && params['songId'] !== undefined ? params['songId'] as string : 'song1';
+    const difficulty: Difficulty = params !== null && params['difficulty'] !== undefined ? params['difficulty'] as Difficulty : Difficulty.Normal;
+    const hasBGM: boolean = params !== null && params['hasBGM'] !== undefined ? params['hasBGM'] as boolean : true;
+
     const config: GameConfig = {
-      songId: 'song1',
-      difficulty: Difficulty.Normal,
+      songId: songId,
+      difficulty: difficulty,
       laneCount: LANE_COUNT,
       scrollSpeed: gameConstants.DEFAULT_SETTINGS.scrollSpeed,
       musicVolume: gameConstants.DEFAULT_SETTINGS.musicVolume,
       sfxVolume: gameConstants.DEFAULT_SETTINGS.sfxVolume,
+      hasBGM: hasBGM,
     };
 
     const uiUpdater: GameUIUpdaterImpl = new GameUIUpdaterImpl(this);
