@@ -1,0 +1,116 @@
+{
+  "string": [
+    {
+      "name": "app_name",
+      "value": "FingerBeat"
+    },
+    {
+      "name": "app_subtitle",
+      "value": "节奏指尖游戏"
+    },
+    {
+      "name": "start_game",
+      "value": "开始击打！"
+    },
+    {
+      "name": "settings",
+      "value": "设置"
+    },
+    {
+      "name": "song_select",
+      "value": "选择曲目"
+    },
+    {
+      "name": "difficulty_easy",
+      "value": "简单"
+    },
+    {
+      "name": "difficulty_normal",
+      "value": "普通"
+    },
+    {
+      "name": "difficulty_hard",
+      "value": "困难"
+    },
+    {
+      "name": "score",
+      "value": "分数"
+    },
+    {
+      "name": "combo",
+      "value": "连击"
+    },
+    {
+      "name": "accuracy",
+      "value": "准确率"
+    },
+    {
+      "name": "max_combo",
+      "value": "最大连击"
+    },
+    {
+      "name": "judgment_perfect",
+      "value": "完美"
+    },
+    {
+      "name": "judgment_great",
+      "value": "优秀"
+    },
+    {
+      "name": "judgment_good",
+      "value": "良好"
+    },
+    {
+      "name": "judgment_miss",
+      "value": "失误"
+    },
+    {
+      "name": "retry",
+      "value": "重试"
+    },
+    {
+      "name": "back_to_songs",
+      "value": "返回曲目列表"
+    },
+    {
+      "name": "resume",
+      "value": "继续"
+    },
+    {
+      "name": "quit",
+      "value": "退出"
+    },
+    {
+      "name": "pause",
+      "value": "暂停"
+    },
+    {
+      "name": "new_record",
+      "value": "新纪录"
+    },
+    {
+      "name": "restore_default",
+      "value": "恢复默认设置"
+    },
+    {
+      "name": "music_volume",
+      "value": "音乐音量"
+    },
+    {
+      "name": "sfx_volume",
+      "value": "音效音量"
+    },
+    {
+      "name": "scroll_speed",
+      "value": "下落速度"
+    },
+    {
+      "name": "best_score",
+      "value": "最佳"
+    },
+    {
+      "name": "no_record",
+      "value": "--"
+    }
+  ]
+}

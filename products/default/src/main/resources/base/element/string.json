@@ -1,0 +1,128 @@
+{
+  "string": [
+    {
+      "name": "module_desc",
+      "value": "FingerBeat main module"
+    },
+    {
+      "name": "ability_desc",
+      "value": "FingerBeat main ability"
+    },
+    {
+      "name": "ability_label",
+      "value": "FingerBeat"
+    },
+    {
+      "name": "app_name",
+      "value": "FingerBeat"
+    },
+    {
+      "name": "app_subtitle",
+      "value": "Rhythm Finger Game"
+    },
+    {
+      "name": "start_game",
+      "value": "Start Beat!"
+    },
+    {
+      "name": "settings",
+      "value": "Settings"
+    },
+    {
+      "name": "song_select",
+      "value": "Select Song"
+    },
+    {
+      "name": "difficulty_easy",
+      "value": "Easy"
+    },
+    {
+      "name": "difficulty_normal",
+      "value": "Normal"
+    },
+    {
+      "name": "difficulty_hard",
+      "value": "Hard"
+    },
+    {
+      "name": "score",
+      "value": "Score"
+    },
+    {
+      "name": "combo",
+      "value": "Combo"
+    },
+    {
+      "name": "accuracy",
+      "value": "Accuracy"
+    },
+    {
+      "name": "max_combo",
+      "value": "Max Combo"
+    },
+    {
+      "name": "judgment_perfect",
+      "value": "PERFECT"
+    },
+    {
+      "name": "judgment_great",
+      "value": "GREAT"
+    },
+    {
+      "name": "judgment_good",
+      "value": "GOOD"
+    },
+    {
+      "name": "judgment_miss",
+      "value": "MISS"
+    },
+    {
+      "name": "retry",
+      "value": "Retry"
+    },
+    {
+      "name": "back_to_songs",
+      "value": "Back to Songs"
+    },
+    {
+      "name": "resume",
+      "value": "Resume"
+    },
+    {
+      "name": "quit",
+      "value": "Quit"
+    },
+    {
+      "name": "pause",
+      "value": "Pause"
+    },
+    {
+      "name": "new_record",
+      "value": "NEW"
+    },
+    {
+      "name": "restore_default",
+      "value": "Restore Defaults"
+    },
+    {
+      "name": "music_volume",
+      "value": "Music Volume"
+    },
+    {
+      "name": "sfx_volume",
+      "value": "SFX Volume"
+    },
+    {
+      "name": "scroll_speed",
+      "value": "Scroll Speed"
+    },
+    {
+      "name": "best_score",
+      "value": "Best"
+    },
+    {
+      "name": "no_record",
+      "value": "--"
+    }
+  ]
+}
