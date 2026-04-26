@@ -12,9 +12,9 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Judgment system with PERFECT/GREAT/GOOD/MISS grading (`JudgeSystem`)
 - Score system with combo multipliers and letter grades S/A/B/C/D (`ScoreSystem`)
 - Note scheduler for position updates, visibility, and MISS detection (`NoteScheduler`)
-- Audio player with BGM (AVPlayer) and SFX (SoundPool) support (`AudioPlayer`)
+- Audio player with BGM (AVPlayer) and SFX support (`AudioPlayer`)
 - Event bus for publish-subscribe communication (`GameEventBus`)
-- Beatmap repository with 3 built-in songs x 3 difficulties (`BeatmapRepository`)
+- Beatmap repository with 4 built-in songs x 3 difficulties (`BeatmapRepository`)
 - Score persistence via HarmonyOS Preferences (`ScoreStore`)
 - Settings persistence via HarmonyOS Preferences (`SettingsStore`)
 - Complete type system with 9 enums and 15+ interfaces (`GameTypes`)
@@ -26,10 +26,13 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - Code lint configuration with performance and security rules
 - Song selection page (`SongSelectPage`) with scrollable level list and back navigation
 - Global EASY / NORMAL / HARD difficulty selector on song select page
-- Practice level "牛刀小试" (level 0) with no BGM, pure tap practice
+- Practice level "牛刀小试" (level 0, song0) with no BGM, pure tap practice
 - Best score tracking: historical best score persisted per song & difficulty
 - New record indicator ("新纪录!") on result screen when best score is beaten
 - Best score display on result screen
+- MISS independent display: MISS shown above corresponding lane (max 2 concurrent), GOOD/GREAT/PERFECT centered
+- Song0 (practice) beatmap with BPM 95, 15s duration
+- Bilingual README (Chinese + English)
 
 ### Changed
 - Start button text changed from "开始游戏" to "开始击打！"
@@ -39,6 +42,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 - `GameConfig` interface now includes `hasBGM` field to support BGM-less practice mode
 - `GameUIUpdater.onGameEnd` signature extended with `bestScore` and `isNewRecord` parameters
 - GameEngine now initializes ScoreStore and persists best scores on game end
+- All levels set to no BGM mode (`hasBGM: false`)
+- Level durations adjusted: Practice 15s, Starry Melody 20s, Electronic Pulse 25s, Dream Beat 35s
+- Beatmaps regenerated with correct targetTime ranges matching level durations
+- `NoteScheduler.checkMissedNotes` now returns lane info (`MissedNoteInfo`) instead of note IDs only
+- GameEngine passes correct lane value for MISS judgments (was hardcoded -1)
+- Level 0 now uses independent song0 beatmap (was sharing song1)
 
 ## [1.2.0] - 2026-04-22
 
