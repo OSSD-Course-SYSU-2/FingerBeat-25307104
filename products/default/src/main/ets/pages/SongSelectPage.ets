@@ -1,6 +1,6 @@
 /**
  * SongSelectPage - Song/level selection page.
- * Displays a scrollable list of available levels with a back button.
+ * Displays a scrollable list of available levels with difficulty selection and a back button.
  */
 import router from '@ohos.router';
 import { Difficulty } from '@ohos/game';
@@ -9,7 +9,6 @@ interface LevelItem {
   levelId: number;
   title: string;
   songId: string;
-  difficulty: Difficulty;
   hasBGM: boolean;
   description: string;
 }
@@ -18,40 +17,41 @@ const LEVEL_LIST: LevelItem[] = [
   {
     levelId: 0,
     title: '牛刀小试',
-    songId: 'song1',
-    difficulty: Difficulty.Normal,
+    songId: 'song0',
     hasBGM: false,
-    description: '无BGM · 纯击打练习'
+    description: 'BPM 95 · 无BGM · 15s'
   },
   {
     levelId: 1,
     title: '星空旋律',
     songId: 'song1',
-    difficulty: Difficulty.Normal,
-    hasBGM: true,
-    description: 'BPM 120 · 30s'
+    hasBGM: false,
+    description: 'BPM 120 · 无BGM · 20s'
   },
   {
     levelId: 2,
     title: '电子脉冲',
     songId: 'song2',
-    difficulty: Difficulty.Normal,
-    hasBGM: true,
-    description: 'BPM 140 · 25s'
+    hasBGM: false,
+    description: 'BPM 140 · 无BGM · 25s'
   },
   {
     levelId: 3,
     title: '梦幻节拍',
     songId: 'song3',
-    difficulty: Difficulty.Normal,
-    hasBGM: true,
-    description: 'BPM 100 · 35s'
+    hasBGM: false,
+    description: 'BPM 100 · 无BGM · 35s'
   }
 ];
+
+const DIFFICULTY_LABELS: string[] = ['EASY', 'NORMAL', 'HARD'];
+const DIFFICULTY_COLORS: string[] = ['#00FF00', '#FFD700', '#FF4500'];
 
 @Entry
 @Component
 struct SongSelectPage {
+  @State selectedDifficulty: number = 1; // 0=Easy, 1=Normal, 2=Hard
+
   build() {
     Column() {
       // Top bar with back arrow
@@ -78,6 +78,28 @@ struct SongSelectPage {
       .height(56)
       .padding({ left: 16, right: 16 })
       .alignItems(VerticalAlign.Center)
+
+      // Global difficulty selector
+      Row() {
+        ForEach([0, 1, 2], (idx: number) => {
+          Text(DIFFICULTY_LABELS[idx])
+            .fontSize(14)
+            .fontColor(this.selectedDifficulty === idx ? '#0D0D1A' : DIFFICULTY_COLORS[idx])
+            .fontWeight(FontWeight.Bold)
+            .padding({ left: 16, right: 16, top: 6, bottom: 6 })
+            .borderRadius(4)
+            .backgroundColor(this.selectedDifficulty === idx ? DIFFICULTY_COLORS[idx] : '#00000000')
+            .borderWidth(1)
+            .borderColor(DIFFICULTY_COLORS[idx])
+            .margin({ left: idx === 0 ? 0 : 8, right: 0 })
+            .onClick(() => {
+              this.selectedDifficulty = idx;
+            })
+        }, (idx: number) => `${idx}`)
+      }
+      .width('100%')
+      .justifyContent(FlexAlign.Center)
+      .padding({ top: 8, bottom: 12 })
 
       // Scrollable level list
       List() {
@@ -111,6 +133,17 @@ struct SongSelectPage {
 
               Blank()
 
+              // Difficulty badge on the right
+              Text(DIFFICULTY_LABELS[this.selectedDifficulty])
+                .fontSize(12)
+                .fontColor(DIFFICULTY_COLORS[this.selectedDifficulty])
+                .fontWeight(FontWeight.Bold)
+                .padding({ left: 8, right: 8, top: 2, bottom: 2 })
+                .borderRadius(4)
+                .borderWidth(1)
+                .borderColor(DIFFICULTY_COLORS[this.selectedDifficulty])
+                .margin({ right: 8 })
+
               // Play arrow
               Text('>')
                 .fontSize(20)
@@ -125,7 +158,7 @@ struct SongSelectPage {
                 url: 'pages/GamePage',
                 params: {
                   songId: item.songId,
-                  difficulty: item.difficulty,
+                  difficulty: this.selectedDifficulty,
                   hasBGM: item.hasBGM,
                   levelId: item.levelId
                 }

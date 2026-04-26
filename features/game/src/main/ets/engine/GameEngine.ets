@@ -90,6 +90,9 @@ class GameEngine {
 
       this.audioPlayer = new AudioPlayer();
 
+      // Initialize SFX (hit sound effect)
+      await this.audioPlayer.initSFX('tap', 'sfx_hit.wav', context);
+
       // Load and play BGM (skip if hasBGM is false, e.g. practice mode)
       if (config.hasBGM) {
         const song = BeatmapRepository.getSongById(config.songId);
@@ -143,14 +146,14 @@ class GameEngine {
     // Check for missed notes
     if (this.noteScheduler !== null && this.judgeSystem !== null && this.scoreSystem !== null) {
       const goodWindow = this.judgmentWindows !== null ? this.judgmentWindows.goodWindow : 150;
-      const missedIds = this.noteScheduler.checkMissedNotes(currentTime, goodWindow);
+      const missedNotes = this.noteScheduler.checkMissedNotes(currentTime, goodWindow);
 
-      for (const noteId of missedIds) {
+      for (const missed of missedNotes) {
         const increment = this.scoreSystem.onJudgment(JudgmentGrade.MISS);
         gameEventBus.emit(GameEventType.NOTE_MISSED);
 
         if (this.uiUpdater !== null) {
-          this.uiUpdater.onJudgmentShow(JudgmentGrade.MISS, -1);
+          this.uiUpdater.onJudgmentShow(JudgmentGrade.MISS, missed.lane);
           this.uiUpdater.onScoreUpdate(this.scoreSystem.getScore(), increment);
           this.uiUpdater.onComboUpdate(this.scoreSystem.getCombo());
         }

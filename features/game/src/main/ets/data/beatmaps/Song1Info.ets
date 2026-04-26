@@ -7,7 +7,7 @@ export const SONG1_INFO: SongInfo = {
   difficulties: [Difficulty.Easy, Difficulty.Normal, Difficulty.Hard],
   audioFilePath: 'bgm_song1.wav',
   coverImagePath: 'icon.png',
-  duration: 30000,
+  duration: 20000,
   bpm: 120,
   source: SongSource.BUILTIN
 };

@@ -7,6 +7,11 @@ import { RuntimeNote, NoteData, JudgmentGrade } from '../model/GameTypes';
 import { NOTE_VISIBLE_AHEAD_TIME, NOTE_VISIBLE_BEHIND_TIME, JUDGMENT_LINE_RATIO } from '../constants/GameConstants';
 import { Logger } from '@ohos/common';
 
+interface MissedNoteInfo {
+  id: string;
+  lane: number;
+}
+
 class NoteScheduler {
   private scrollSpeed: number;
   private judgmentLineY: number;
@@ -78,10 +83,10 @@ class NoteScheduler {
    * Check for notes that have been missed (passed beyond the good window).
    * @param currentTime - Current game time in ms
    * @param goodWindow - Good judgment window in ms
-   * @returns Array of missed note IDs
+   * @returns Array of missed note IDs with lane info
    */
-  checkMissedNotes(currentTime: number, goodWindow: number): string[] {
-    const missedIds: string[] = [];
+  checkMissedNotes(currentTime: number, goodWindow: number): MissedNoteInfo[] {
+    const missed: MissedNoteInfo[] = [];
 
     for (const note of this.notes) {
       if (note.isJudged) {
@@ -91,15 +96,16 @@ class NoteScheduler {
       if (currentTime - note.targetTime > goodWindow) {
         note.isJudged = true;
         note.isVisible = false;
-        missedIds.push(note.id);
+        const info: MissedNoteInfo = { id: note.id, lane: note.lane };
+        missed.push(info);
       }
     }
 
-    if (missedIds.length > 0) {
-      Logger.info(`NoteScheduler.checkMissedNotes: ${missedIds.length} notes missed`);
+    if (missed.length > 0) {
+      Logger.info(`NoteScheduler.checkMissedNotes: ${missed.length} notes missed`);
     }
 
-    return missedIds;
+    return missed;
   }
 
   /**

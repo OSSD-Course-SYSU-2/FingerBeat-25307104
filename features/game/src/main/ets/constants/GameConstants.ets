@@ -74,13 +74,17 @@ export interface ComboMultiplierEntry {
   multiplier: number;
 }
 
-export const COMBO_MULTIPLIER_50: ComboMultiplierEntry = { threshold: 50, multiplier: 1.3 };
-export const COMBO_MULTIPLIER_30: ComboMultiplierEntry = { threshold: 30, multiplier: 1.2 };
-export const COMBO_MULTIPLIER_10: ComboMultiplierEntry = { threshold: 10, multiplier: 1.1 };
+export const COMBO_MULTIPLIER_64: ComboMultiplierEntry = { threshold: 64, multiplier: 1.5 };
+export const COMBO_MULTIPLIER_32: ComboMultiplierEntry = { threshold: 32, multiplier: 1.4 };
+export const COMBO_MULTIPLIER_16: ComboMultiplierEntry = { threshold: 16, multiplier: 1.3 };
+export const COMBO_MULTIPLIER_8: ComboMultiplierEntry = { threshold: 8, multiplier: 1.2 };
+export const COMBO_MULTIPLIER_4: ComboMultiplierEntry = { threshold: 4, multiplier: 1.1 };
 export const COMBO_MULTIPLIERS: ComboMultiplierEntry[] = [
-  COMBO_MULTIPLIER_50,
-  COMBO_MULTIPLIER_30,
-  COMBO_MULTIPLIER_10,
+  COMBO_MULTIPLIER_64,
+  COMBO_MULTIPLIER_32,
+  COMBO_MULTIPLIER_16,
+  COMBO_MULTIPLIER_8,
+  COMBO_MULTIPLIER_4,
 ];
 
 // ==================== Letter Grade Thresholds ====================

@@ -1,6 +1,18 @@
-import { NoteData, NoteType } from '../../model/GameTypes';
+import { SongInfo, Difficulty, SongSource, NoteData, NoteType } from '../../model/GameTypes';
 
-export const SONG1_EASY: NoteData[] = [
+export const SONG0_INFO: SongInfo = {
+  id: 'song0',
+  title: '牛刀小试',
+  artist: 'FingerBeat',
+  difficulties: [Difficulty.Easy, Difficulty.Normal, Difficulty.Hard],
+  audioFilePath: 'bgm_song0.wav',
+  coverImagePath: 'icon.png',
+  duration: 15000,
+  bpm: 95,
+  source: SongSource.BUILTIN
+};
+
+export const SONG0_EASY: NoteData[] = [
   { id: '0', lane: 1, targetTime: 2000, type: NoteType.TAP },
   { id: '1', lane: 2, targetTime: 2500, type: NoteType.TAP },
   { id: '2', lane: 0, targetTime: 3000, type: NoteType.TAP },
@@ -28,19 +40,9 @@ export const SONG1_EASY: NoteData[] = [
   { id: '24', lane: 1, targetTime: 14000, type: NoteType.TAP },
   { id: '25', lane: 2, targetTime: 14500, type: NoteType.TAP },
   { id: '26', lane: 0, targetTime: 15000, type: NoteType.TAP },
-  { id: '27', lane: 3, targetTime: 15500, type: NoteType.TAP },
-  { id: '28', lane: 1, targetTime: 16000, type: NoteType.TAP },
-  { id: '29', lane: 2, targetTime: 16500, type: NoteType.TAP },
-  { id: '30', lane: 0, targetTime: 17000, type: NoteType.TAP },
-  { id: '31', lane: 3, targetTime: 17500, type: NoteType.TAP },
-  { id: '32', lane: 1, targetTime: 18000, type: NoteType.TAP },
-  { id: '33', lane: 2, targetTime: 18500, type: NoteType.TAP },
-  { id: '34', lane: 0, targetTime: 19000, type: NoteType.TAP },
-  { id: '35', lane: 3, targetTime: 19500, type: NoteType.TAP },
-  { id: '36', lane: 1, targetTime: 20000, type: NoteType.TAP },
 ];
 
-export const SONG1_NORMAL: NoteData[] = [
+export const SONG0_NORMAL: NoteData[] = [
   { id: '0', lane: 0, targetTime: 2000, type: NoteType.TAP },
   { id: '1', lane: 1, targetTime: 2375, type: NoteType.TAP },
   { id: '2', lane: 2, targetTime: 2750, type: NoteType.TAP },
@@ -76,23 +78,9 @@ export const SONG1_NORMAL: NoteData[] = [
   { id: '32', lane: 0, targetTime: 14000, type: NoteType.TAP },
   { id: '33', lane: 1, targetTime: 14375, type: NoteType.TAP },
   { id: '34', lane: 2, targetTime: 14750, type: NoteType.TAP },
-  { id: '35', lane: 3, targetTime: 15125, type: NoteType.TAP },
-  { id: '36', lane: 0, targetTime: 15500, type: NoteType.TAP },
-  { id: '37', lane: 1, targetTime: 15875, type: NoteType.TAP },
-  { id: '38', lane: 2, targetTime: 16250, type: NoteType.TAP },
-  { id: '39', lane: 3, targetTime: 16625, type: NoteType.TAP },
-  { id: '40', lane: 0, targetTime: 17000, type: NoteType.TAP },
-  { id: '41', lane: 1, targetTime: 17375, type: NoteType.TAP },
-  { id: '42', lane: 2, targetTime: 17750, type: NoteType.TAP },
-  { id: '43', lane: 3, targetTime: 18125, type: NoteType.TAP },
-  { id: '44', lane: 0, targetTime: 18500, type: NoteType.TAP },
-  { id: '45', lane: 1, targetTime: 18875, type: NoteType.TAP },
-  { id: '46', lane: 2, targetTime: 19250, type: NoteType.TAP },
-  { id: '47', lane: 3, targetTime: 19625, type: NoteType.TAP },
-  { id: '48', lane: 0, targetTime: 20000, type: NoteType.TAP },
 ];
 
-export const SONG1_HARD: NoteData[] = [
+export const SONG0_HARD: NoteData[] = [
   { id: '0', lane: 2, targetTime: 2000, type: NoteType.TAP },
   { id: '1', lane: 1, targetTime: 2250, type: NoteType.TAP },
   { id: '2', lane: 3, targetTime: 2500, type: NoteType.TAP },
@@ -146,24 +134,4 @@ export const SONG1_HARD: NoteData[] = [
   { id: '50', lane: 3, targetTime: 14500, type: NoteType.TAP },
   { id: '51', lane: 0, targetTime: 14750, type: NoteType.TAP },
   { id: '52', lane: 2, targetTime: 15000, type: NoteType.TAP },
-  { id: '53', lane: 1, targetTime: 15250, type: NoteType.TAP },
-  { id: '54', lane: 3, targetTime: 15500, type: NoteType.TAP },
-  { id: '55', lane: 0, targetTime: 15750, type: NoteType.TAP },
-  { id: '56', lane: 2, targetTime: 16000, type: NoteType.TAP },
-  { id: '57', lane: 1, targetTime: 16250, type: NoteType.TAP },
-  { id: '58', lane: 3, targetTime: 16500, type: NoteType.TAP },
-  { id: '59', lane: 0, targetTime: 16750, type: NoteType.TAP },
-  { id: '60', lane: 2, targetTime: 17000, type: NoteType.TAP },
-  { id: '61', lane: 1, targetTime: 17250, type: NoteType.TAP },
-  { id: '62', lane: 3, targetTime: 17500, type: NoteType.TAP },
-  { id: '63', lane: 0, targetTime: 17750, type: NoteType.TAP },
-  { id: '64', lane: 2, targetTime: 18000, type: NoteType.TAP },
-  { id: '65', lane: 1, targetTime: 18250, type: NoteType.TAP },
-  { id: '66', lane: 3, targetTime: 18500, type: NoteType.TAP },
-  { id: '67', lane: 0, targetTime: 18750, type: NoteType.TAP },
-  { id: '68', lane: 2, targetTime: 19000, type: NoteType.TAP },
-  { id: '69', lane: 1, targetTime: 19250, type: NoteType.TAP },
-  { id: '70', lane: 3, targetTime: 19500, type: NoteType.TAP },
-  { id: '71', lane: 0, targetTime: 19750, type: NoteType.TAP },
-  { id: '72', lane: 2, targetTime: 20000, type: NoteType.TAP },
 ];

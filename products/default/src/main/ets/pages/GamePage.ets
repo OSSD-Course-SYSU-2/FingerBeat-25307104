@@ -14,6 +14,12 @@ const JUDGMENT_LINE_RATIO: number = 0.85;
 const NOTE_WIDTH_RATIO: number = 0.9;
 const NOTE_HEIGHT: number = 24;
 const DRAW_INTERVAL: number = 16; // ~60fps
+const MAX_MISS_DISPLAY: number = 2;
+
+interface MissEntry {
+  lane: number;
+  timestamp: number;
+}
 
 @Entry
 @Component
@@ -33,6 +39,7 @@ struct GamePage {
   @State combo: number = 0;
   @State judgmentText: string = '';
   @State judgmentColor: string = '#FFFFFF';
+  @State missEntries: MissEntry[] = [];
   @State isPaused: boolean = false;
   @State isEnded: boolean = false;
   @State endScore: number = 0;
@@ -137,6 +144,8 @@ struct GamePage {
       c.fillRect(x, y, noteW, NOTE_HEIGHT);
       c.globalAlpha = 1.0;
     }
+
+    // (MISS indicators rendered via Text components in build())
   }
 
   build() {
@@ -176,7 +185,7 @@ struct GamePage {
         .width('100%')
         .padding({ left: 16, right: 16, top: 8 })
 
-        // Judgment text
+        // Judgment text (GOOD/GREAT/PERFECT only)
         if (this.judgmentText !== '') {
           Text(this.judgmentText)
             .fontSize(28)
@@ -206,6 +215,21 @@ struct GamePage {
       .width('100%')
       .height('100%')
       .hitTestBehavior(HitTestMode.Transparent)
+
+      // MISS indicators - Text components at judgment line, centered in each lane
+      if (this.missEntries.length > 0) {
+        ForEach(this.missEntries, (entry: MissEntry) => {
+          Text('MISS')
+            .fontSize(28)
+            .fontColor('#FF4500')
+            .fontWeight(FontWeight.Bold)
+            .markAnchor({ x: '50%', y: '50%' })
+            .position({
+              x: `${entry.lane * 25 + 12.5}%`,
+              y: `${JUDGMENT_LINE_RATIO * 100 - 6}%`
+            })
+        }, (entry: MissEntry) => `${entry.timestamp}`)
+      }
 
       // Pause
       if (!this.isEnded) {
@@ -295,9 +319,26 @@ class GameUIUpdaterImpl extends GameUIUpdater {
     this.page.combo = combo;
   }
 
-  onJudgmentShow(grade: JudgmentGrade, _lane: number): void {
-    this.page.judgmentText = gameConstants.getJudgmentLabel(grade);
-    this.page.judgmentColor = gameConstants.getJudgmentColor(grade);
+  onJudgmentShow(grade: JudgmentGrade, lane: number): void {
+    if (grade === JudgmentGrade.MISS) {
+      // MISS: add to missEntries (max 2), positioned at lane center on judgment line
+      const current = this.page.missEntries;
+      const newEntry: MissEntry = { lane: lane, timestamp: Date.now() };
+      if (current.length >= MAX_MISS_DISPLAY) {
+        // Remove oldest, add new
+        this.page.missEntries = [current[current.length - 1], newEntry];
+      } else {
+        this.page.missEntries = [...current, newEntry];
+      }
+      // Clear non-MISS judgment text
+      this.page.judgmentText = '';
+    } else {
+      // GOOD/GREAT/PERFECT: show as before at screen center top
+      this.page.judgmentText = gameConstants.getJudgmentLabel(grade);
+      this.page.judgmentColor = gameConstants.getJudgmentColor(grade);
+      // Clear MISS entries when a non-MISS judgment occurs
+      this.page.missEntries = [];
+    }
   }
 
   onGameEnd(result: GameResult, bestScore: number, isNewRecord: boolean): void {

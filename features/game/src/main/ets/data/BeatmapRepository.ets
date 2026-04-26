@@ -1,4 +1,5 @@
 import { SongInfo, Beatmap, Difficulty, NoteData, SongSource } from '../model/GameTypes';
+import { SONG0_INFO, SONG0_EASY, SONG0_NORMAL, SONG0_HARD } from './beatmaps/Song0Beatmaps';
 import { SONG1_INFO } from './beatmaps/Song1Info';
 import { SONG1_EASY, SONG1_NORMAL, SONG1_HARD } from './beatmaps/Song1Beatmaps';
 import { SONG2_INFO, SONG2_EASY, SONG2_NORMAL, SONG2_HARD } from './beatmaps/Song2Beatmaps';
@@ -10,7 +11,10 @@ class BeatmapRepository {
   private beatmaps: Map<string, NoteData[]> = new Map();
 
   constructor() {
-    this.songs = [SONG1_INFO, SONG2_INFO, SONG3_INFO];
+    this.songs = [SONG0_INFO, SONG1_INFO, SONG2_INFO, SONG3_INFO];
+    this.beatmaps.set(`${SONG0_INFO.id}_${Difficulty.Easy}`, SONG0_EASY);
+    this.beatmaps.set(`${SONG0_INFO.id}_${Difficulty.Normal}`, SONG0_NORMAL);
+    this.beatmaps.set(`${SONG0_INFO.id}_${Difficulty.Hard}`, SONG0_HARD);
     this.beatmaps.set(`${SONG1_INFO.id}_${Difficulty.Easy}`, SONG1_EASY);
     this.beatmaps.set(`${SONG1_INFO.id}_${Difficulty.Normal}`, SONG1_NORMAL);
     this.beatmaps.set(`${SONG1_INFO.id}_${Difficulty.Hard}`, SONG1_HARD);
