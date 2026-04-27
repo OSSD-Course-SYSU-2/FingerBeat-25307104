@@ -7,6 +7,7 @@
 
 export enum GameState {
   IDLE,
+  COUNTDOWN,
   PLAYING,
   PAUSED,
   ENDED
