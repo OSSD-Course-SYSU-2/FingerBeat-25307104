@@ -5,7 +5,32 @@ All notable changes to FingerBeat will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
-## [1.3.0] - 2026-04-25
+## [1.3.1] - 2026-04-27
+
+### Added
+- Runtime language switching between Simplified Chinese and English via `LanguageManager` singleton
+- `LanguageSwitchButton` component (rounded rect, transparent fill, text color matches border)
+- 3-second countdown overlay (3→2→1→BEAT) before game start with touch/interaction blocking
+- `ResultOverlay` component extracted from GamePage with full i18n support
+- 15+ i18n entries across zh_CN, en_US, and base string resources
+- `LanguageManager` with built-in translation map, Preferences persistence, system locale detection, and fallback to Chinese for unsupported languages
+- Countdown cancellation on back key press with proper cleanup
+- Pause button i18n during gameplay
+
+### Changed
+- Index page: dark background (#0D0D1A), white text (#FFFFFF), language switch button, i18n for all text
+- SongSelectPage: level title, difficulty, and description now use i18n via `t()` helper
+- GamePage: countdown logic inlined (3→2→1→BEAT), ResultOverlay integration, interaction blocking during countdown
+- "开始击打！" English translation: "Ready to Beat" (Title Case, no exclamation mark)
+- "开始演奏！" English translation: "Beat It Yourself"
+- Start button text i18n-aware
+
+### Fixed
+- `resourceManager.updateOverrideConfiguration()` does not trigger `$r()` refresh at runtime — switched to built-in translation map approach
+- UI not re-rendering on language switch — `t()` helper now depends on `this.currentLang` to stay in ArkUI state tracking
+- Build errors: 5 API compatibility fixes
+
+## [1.3.0] - 2026-04-26
 
 ### Added
 - Game engine core with main loop controller (`GameEngine`)
