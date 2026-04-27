@@ -1,60 +1,82 @@
-/**
- * SongSelectPage - Song/level selection page.
- * Displays a scrollable list of available levels with difficulty selection and a back button.
- */
 import router from '@ohos.router';
 import { Difficulty } from '@ohos/game';
+import { languageManager } from '@ohos/common';
 
 interface LevelItem {
   levelId: number;
-  title: string;
+  titleKey: string;
   songId: string;
   hasBGM: boolean;
-  description: string;
+  descriptionBpm: string;
+  hasBGMFlag: boolean;
+  duration: string;
 }
 
 const LEVEL_LIST: LevelItem[] = [
   {
     levelId: 0,
-    title: '牛刀小试',
+    titleKey: 'level_warm_up',
     songId: 'song0',
     hasBGM: false,
-    description: 'BPM 95 · 无BGM · 15s'
+    descriptionBpm: 'BPM 95',
+    hasBGMFlag: false,
+    duration: '15s'
   },
   {
     levelId: 1,
-    title: '星空旋律',
+    titleKey: 'level_starry_melody',
     songId: 'song1',
     hasBGM: false,
-    description: 'BPM 120 · 无BGM · 20s'
+    descriptionBpm: 'BPM 120',
+    hasBGMFlag: false,
+    duration: '20s'
   },
   {
     levelId: 2,
-    title: '电子脉冲',
+    titleKey: 'level_electro_pulse',
     songId: 'song2',
     hasBGM: false,
-    description: 'BPM 140 · 无BGM · 25s'
+    descriptionBpm: 'BPM 140',
+    hasBGMFlag: false,
+    duration: '25s'
   },
   {
     levelId: 3,
-    title: '梦幻节拍',
+    titleKey: 'level_dream_beat',
     songId: 'song3',
     hasBGM: false,
-    description: 'BPM 100 · 无BGM · 35s'
+    descriptionBpm: 'BPM 100',
+    hasBGMFlag: false,
+    duration: '35s'
   }
 ];
 
-const DIFFICULTY_LABELS: string[] = ['EASY', 'NORMAL', 'HARD'];
 const DIFFICULTY_COLORS: string[] = ['#00FF00', '#FFD700', '#FF4500'];
+const DIFFICULTY_KEYS: string[] = ['difficulty_easy', 'difficulty_normal', 'difficulty_hard'];
 
 @Entry
 @Component
 struct SongSelectPage {
-  @State selectedDifficulty: number = 1; // 0=Easy, 1=Normal, 2=Hard
+  @State selectedDifficulty: number = 1;
+  @State currentLang: string = 'zh';
+
+  aboutToAppear(): void {
+    this.currentLang = languageManager.getLanguage();
+  }
+
+  private t(key: string): string {
+    const _: string = this.currentLang;
+    return languageManager.getText(key);
+  }
+
+  private getLevelDescription(item: LevelItem): string {
+    const noBgmText: string = this.t('no_bgm');
+    const bgmPart: string = item.hasBGMFlag ? '' : ` · ${noBgmText}`;
+    return `${item.descriptionBpm}${bgmPart} · ${item.duration}`;
+  }
 
   build() {
     Column() {
-      // Top bar with back arrow
       Row() {
         Text('<')
           .fontSize(24)
@@ -64,12 +86,11 @@ struct SongSelectPage {
             router.back();
           })
         Blank()
-        Text($r('app.string.song_select'))
+        Text(this.t('song_select'))
           .fontSize(20)
           .fontColor('#FFFFFF')
           .fontWeight(FontWeight.Bold)
         Blank()
-        // Spacer to center the title
         Text('<')
           .fontSize(24)
           .fontColor('#00000000')
@@ -79,10 +100,9 @@ struct SongSelectPage {
       .padding({ left: 16, right: 16 })
       .alignItems(VerticalAlign.Center)
 
-      // Global difficulty selector
       Row() {
         ForEach([0, 1, 2], (idx: number) => {
-          Text(DIFFICULTY_LABELS[idx])
+          Text(this.t(DIFFICULTY_KEYS[idx]))
             .fontSize(14)
             .fontColor(this.selectedDifficulty === idx ? '#0D0D1A' : DIFFICULTY_COLORS[idx])
             .fontWeight(FontWeight.Bold)
@@ -101,12 +121,10 @@ struct SongSelectPage {
       .justifyContent(FlexAlign.Center)
       .padding({ top: 8, bottom: 12 })
 
-      // Scrollable level list
       List() {
         ForEach(LEVEL_LIST, (item: LevelItem) => {
           ListItem() {
             Row() {
-              // Level number badge
               Text(`${item.levelId}`)
                 .fontSize(20)
                 .fontColor('#FFD700')
@@ -118,13 +136,12 @@ struct SongSelectPage {
                 .backgroundColor('#333366')
                 .margin({ right: 16 })
 
-              // Level info
               Column() {
-                Text(item.title)
+                Text(this.t(item.titleKey))
                   .fontSize(18)
                   .fontColor('#FFFFFF')
                   .fontWeight(FontWeight.Bold)
-                Text(item.description)
+                Text(this.getLevelDescription(item))
                   .fontSize(13)
                   .fontColor('#AAAAAA')
                   .margin({ top: 4 })
@@ -133,8 +150,7 @@ struct SongSelectPage {
 
               Blank()
 
-              // Difficulty badge on the right
-              Text(DIFFICULTY_LABELS[this.selectedDifficulty])
+              Text(this.t(DIFFICULTY_KEYS[this.selectedDifficulty]))
                 .fontSize(12)
                 .fontColor(DIFFICULTY_COLORS[this.selectedDifficulty])
                 .fontWeight(FontWeight.Bold)
@@ -144,7 +160,6 @@ struct SongSelectPage {
                 .borderColor(DIFFICULTY_COLORS[this.selectedDifficulty])
                 .margin({ right: 8 })
 
-              // Play arrow
               Text('>')
                 .fontSize(20)
                 .fontColor('#666699')

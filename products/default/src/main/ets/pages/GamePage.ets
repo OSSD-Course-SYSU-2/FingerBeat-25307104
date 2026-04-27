@@ -1,19 +1,17 @@
-/**
- * GamePage - FingerBeat game play page.
- * Uses Canvas for game rendering with a separate draw timer.
- */
 import {
   GameEngine, GameUIUpdater, gameConstants,
   Difficulty, GameState, JudgmentGrade, RuntimeNote, GameResult, GameConfig,
   NoteType,
 } from '@ohos/game';
 import router from '@ohos.router';
+import { languageManager } from '@ohos/common';
+import { ResultOverlay } from '../components/ResultOverlay';
 
 const LANE_COUNT: number = 4;
 const JUDGMENT_LINE_RATIO: number = 0.85;
 const NOTE_WIDTH_RATIO: number = 0.9;
 const NOTE_HEIGHT: number = 24;
-const DRAW_INTERVAL: number = 16; // ~60fps
+const DRAW_INTERVAL: number = 16;
 const MAX_MISS_DISPLAY: number = 2;
 
 interface MissEntry {
@@ -34,6 +32,8 @@ struct GamePage {
   private gameStarted: boolean = false;
   private canvasReady: boolean = false;
   latestNotes: RuntimeNote[] = [];
+  private countdownTimerId: number = -1;
+  private routerParams: Record<string, Object> | null = null;
 
   @State score: number = 0;
   @State combo: number = 0;
@@ -42,28 +42,72 @@ struct GamePage {
   @State missEntries: MissEntry[] = [];
   @State isPaused: boolean = false;
   @State isEnded: boolean = false;
+  @State isCountdownActive: boolean = false;
+  @State countdownDisplayText: string = '';
+  @State currentLang: string = 'zh';
   @State endScore: number = 0;
   @State endAccuracy: number = 0;
   @State endMaxCombo: number = 0;
   @State endBestScore: number = 0;
   @State endIsNewRecord: boolean = false;
 
+  aboutToAppear(): void {
+    this.currentLang = languageManager.getLanguage();
+  }
+
+  private t(key: string): string {
+    const _: string = this.currentLang;
+    return languageManager.getText(key);
+  }
+
   aboutToDisappear(): void {
     if (this.drawTimerId !== -1) {
       clearInterval(this.drawTimerId);
     }
+    this.cancelCountdown();
     this.engine.quit();
   }
 
   private tryStartGame(): void {
-    // Only start when both canvas is ready AND we have valid screen dimensions
     if (this.gameStarted || !this.canvasReady || this.h === 0) {
       return;
     }
     this.gameStarted = true;
+    this.routerParams = router.getParams() as Record<string, Object>;
+    this.startCountdown();
+  }
 
-    // Read params from router (passed from SongSelectPage)
-    const params = router.getParams() as Record<string, Object>;
+  private startCountdown(): void {
+    this.isCountdownActive = true;
+    this.countdownDisplayText = '3';
+    this.countdownTimerId = setTimeout(() => {
+      this.countdownDisplayText = '2';
+      this.countdownTimerId = setTimeout(() => {
+        this.countdownDisplayText = '1';
+        this.countdownTimerId = setTimeout(() => {
+          this.countdownDisplayText = 'BEAT';
+          this.countdownTimerId = setTimeout(() => {
+            this.isCountdownActive = false;
+            this.countdownDisplayText = '';
+            this.countdownTimerId = -1;
+            this.onCountdownEnd();
+          }, 500);
+        }, 1000);
+      }, 1000);
+    }, 1000);
+  }
+
+  private cancelCountdown(): void {
+    if (this.countdownTimerId !== -1) {
+      clearTimeout(this.countdownTimerId);
+      this.countdownTimerId = -1;
+    }
+    this.isCountdownActive = false;
+    this.countdownDisplayText = '';
+  }
+
+  private onCountdownEnd(): void {
+    const params = this.routerParams;
     const songId: string = params !== null && params['songId'] !== undefined ? params['songId'] as string : 'song1';
     const difficulty: Difficulty = params !== null && params['difficulty'] !== undefined ? params['difficulty'] as Difficulty : Difficulty.Normal;
     const hasBGM: boolean = params !== null && params['hasBGM'] !== undefined ? params['hasBGM'] as boolean : true;
@@ -81,10 +125,18 @@ struct GamePage {
     const uiUpdater: GameUIUpdaterImpl = new GameUIUpdaterImpl(this);
     this.engine.start(config, getContext(this), uiUpdater, this.h);
 
-    // Start independent draw loop
     this.drawTimerId = setInterval(() => {
       this.draw();
     }, DRAW_INTERVAL);
+  }
+
+  onBackPress(): boolean {
+    if (this.isCountdownActive) {
+      this.cancelCountdown();
+      router.back();
+      return true;
+    }
+    return false;
   }
 
   private draw(): void {
@@ -95,11 +147,9 @@ struct GamePage {
     const c = this.ctx;
     c.clearRect(0, 0, this.w, this.h);
 
-    // Background
     c.fillStyle = '#0D0D1A';
     c.fillRect(0, 0, this.w, this.h);
 
-    // Lane dividers
     c.strokeStyle = '#333366';
     c.lineWidth = 1;
     for (let i = 1; i < LANE_COUNT; i++) {
@@ -110,7 +160,6 @@ struct GamePage {
       c.stroke();
     }
 
-    // Judgment line
     c.strokeStyle = '#FFFFFF';
     c.lineWidth = 3;
     c.beginPath();
@@ -118,7 +167,6 @@ struct GamePage {
     c.lineTo(this.w, this.judgY);
     c.stroke();
 
-    // Notes
     const noteW = this.laneW * NOTE_WIDTH_RATIO;
     const noteOff = (this.laneW - noteW) / 2;
     const notes = this.latestNotes;
@@ -144,13 +192,10 @@ struct GamePage {
       c.fillRect(x, y, noteW, NOTE_HEIGHT);
       c.globalAlpha = 1.0;
     }
-
-    // (MISS indicators rendered via Text components in build())
   }
 
   build() {
     Stack() {
-      // Canvas - renders the game field
       Canvas(this.ctx)
         .width('100%')
         .height('100%')
@@ -166,11 +211,9 @@ struct GamePage {
           this.tryStartGame();
         })
 
-      // HUD overlay - fully transparent, click-through
       Column() {
-        // Score bar
         Row() {
-          Text(`Score: ${this.score}`)
+          Text(`${this.t('score_label')}: ${this.score}`)
             .fontSize(20)
             .fontColor('#FFFFFF')
             .fontWeight(FontWeight.Bold)
@@ -185,7 +228,6 @@ struct GamePage {
         .width('100%')
         .padding({ left: 16, right: 16, top: 8 })
 
-        // Judgment text (GOOD/GREAT/PERFECT only)
         if (this.judgmentText !== '') {
           Text(this.judgmentText)
             .fontSize(28)
@@ -196,14 +238,13 @@ struct GamePage {
 
         Blank()
 
-        // Tap zones at bottom
         Row() {
           ForEach(Array.from({ length: LANE_COUNT }, (_v: undefined, i: number) => i), (idx: number) => {
             Column()
               .width(`${100 / LANE_COUNT}%`)
               .height('100%')
               .onClick(() => {
-                if (!this.isPaused && !this.isEnded) {
+                if (!this.isPaused && !this.isEnded && !this.isCountdownActive) {
                   this.engine.onLaneTap(idx);
                 }
               })
@@ -216,7 +257,6 @@ struct GamePage {
       .height('100%')
       .hitTestBehavior(HitTestMode.Transparent)
 
-      // MISS indicators - Text components at judgment line, centered in each lane
       if (this.missEntries.length > 0) {
         ForEach(this.missEntries, (entry: MissEntry) => {
           Text('MISS')
@@ -231,9 +271,8 @@ struct GamePage {
         }, (entry: MissEntry) => `${entry.timestamp}`)
       }
 
-      // Pause
-      if (!this.isEnded) {
-        Button(this.isPaused ? '继续' : '暂停')
+      if (!this.isEnded && !this.isCountdownActive) {
+        Button(this.isPaused ? this.t('resume_label') : this.t('pause_label'))
           .fontSize(14)
           .width(60)
           .height(32)
@@ -249,49 +288,33 @@ struct GamePage {
           })
       }
 
-      // Result
-      if (this.isEnded) {
-        Column() {
-          Text('游戏结束')
-            .fontSize(32)
+      if (this.isCountdownActive) {
+        Stack() {
+          Column()
+            .width('100%')
+            .height('100%')
+            .backgroundColor('#80000000')
+            .hitTestBehavior(HitTestMode.Block)
+
+          Text(this.countdownDisplayText)
+            .fontSize(72)
             .fontColor('#FFFFFF')
             .fontWeight(FontWeight.Bold)
-            .margin({ bottom: 16 })
-          Text(`Score: ${this.endScore}`)
-            .fontSize(24)
-            .fontColor('#FFD700')
-            .margin({ bottom: 8 })
-          if (this.endIsNewRecord) {
-            Text('新纪录!')
-              .fontSize(18)
-              .fontColor('#FF4500')
-              .fontWeight(FontWeight.Bold)
-              .margin({ bottom: 8 })
-          }
-          Text(`Best: ${this.endBestScore}`)
-            .fontSize(20)
-            .fontColor('#AAAAAA')
-            .margin({ bottom: 8 })
-          Text(`Accuracy: ${(this.endAccuracy * 100).toFixed(1)}%`)
-            .fontSize(20)
-            .fontColor('#FFFFFF')
-            .margin({ bottom: 8 })
-          Text(`Max Combo: ${this.endMaxCombo}`)
-            .fontSize(20)
-            .fontColor('#FFFFFF')
-            .margin({ bottom: 24 })
-          Button('返回主页')
-            .fontSize(18)
-            .width('60%')
-            .height(48)
-            .onClick(() => {
-              router.back();
-            })
+            .textAlign(TextAlign.Center)
         }
         .width('100%')
         .height('100%')
-        .justifyContent(FlexAlign.Center)
-        .backgroundColor('#CC000000')
+      }
+
+      if (this.isEnded) {
+        ResultOverlay({
+          score: this.endScore,
+          accuracy: this.endAccuracy,
+          maxCombo: this.endMaxCombo,
+          bestScore: this.endBestScore,
+          isNewRecord: this.endIsNewRecord,
+          lang: this.currentLang
+        })
       }
     }
     .width('100%')
@@ -321,22 +344,17 @@ class GameUIUpdaterImpl extends GameUIUpdater {
 
   onJudgmentShow(grade: JudgmentGrade, lane: number): void {
     if (grade === JudgmentGrade.MISS) {
-      // MISS: add to missEntries (max 2), positioned at lane center on judgment line
       const current = this.page.missEntries;
       const newEntry: MissEntry = { lane: lane, timestamp: Date.now() };
       if (current.length >= MAX_MISS_DISPLAY) {
-        // Remove oldest, add new
         this.page.missEntries = [current[current.length - 1], newEntry];
       } else {
         this.page.missEntries = [...current, newEntry];
       }
-      // Clear non-MISS judgment text
       this.page.judgmentText = '';
     } else {
-      // GOOD/GREAT/PERFECT: show as before at screen center top
       this.page.judgmentText = gameConstants.getJudgmentLabel(grade);
       this.page.judgmentColor = gameConstants.getJudgmentColor(grade);
-      // Clear MISS entries when a non-MISS judgment occurs
       this.page.missEntries = [];
     }
   }

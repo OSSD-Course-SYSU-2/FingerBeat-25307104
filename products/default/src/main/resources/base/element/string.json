@@ -123,6 +123,66 @@
     {
       "name": "no_record",
       "value": "--"
+    },
+    {
+      "name": "result_title",
+      "value": "Results"
+    },
+    {
+      "name": "new_record_full",
+      "value": "NEW RECORD!"
+    },
+    {
+      "name": "back",
+      "value": "Back"
+    },
+    {
+      "name": "pause_label",
+      "value": "Pause"
+    },
+    {
+      "name": "resume_label",
+      "value": "Resume"
+    },
+    {
+      "name": "score_label",
+      "value": "Score"
+    },
+    {
+      "name": "best_label",
+      "value": "Best"
+    },
+    {
+      "name": "accuracy_label",
+      "value": "Accuracy"
+    },
+    {
+      "name": "max_combo_label",
+      "value": "Max Combo"
+    },
+    {
+      "name": "countdown_beat",
+      "value": "BEAT"
+    },
+    {
+      "name": "level_warm_up",
+      "value": "Warm Up"
+    },
+    {
+      "name": "level_starry_melody",
+      "value": "Starry Melody"
+    },
+    {
+      "name": "level_electro_pulse",
+      "value": "Electro Pulse"
+    },
+    {
+      "name": "level_dream_beat",
+      "value": "Dream Beat"
+    },
+    {
+      "name": "no_bgm",
+      "value": "No BGM"
     }
   ]
 }

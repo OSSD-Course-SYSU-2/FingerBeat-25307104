@@ -111,6 +111,66 @@
     {
       "name": "no_record",
       "value": "--"
+    },
+    {
+      "name": "result_title",
+      "value": "结算"
+    },
+    {
+      "name": "new_record_full",
+      "value": "新纪录！"
+    },
+    {
+      "name": "back",
+      "value": "返回"
+    },
+    {
+      "name": "pause_label",
+      "value": "暂停"
+    },
+    {
+      "name": "resume_label",
+      "value": "继续"
+    },
+    {
+      "name": "score_label",
+      "value": "分数"
+    },
+    {
+      "name": "best_label",
+      "value": "最佳"
+    },
+    {
+      "name": "accuracy_label",
+      "value": "准确率"
+    },
+    {
+      "name": "max_combo_label",
+      "value": "最大连击"
+    },
+    {
+      "name": "countdown_beat",
+      "value": "BEAT"
+    },
+    {
+      "name": "level_warm_up",
+      "value": "牛刀小试"
+    },
+    {
+      "name": "level_starry_melody",
+      "value": "星空旋律"
+    },
+    {
+      "name": "level_electro_pulse",
+      "value": "电子脉冲"
+    },
+    {
+      "name": "level_dream_beat",
+      "value": "梦幻节拍"
+    },
+    {
+      "name": "no_bgm",
+      "value": "无BGM"
     }
   ]
 }
