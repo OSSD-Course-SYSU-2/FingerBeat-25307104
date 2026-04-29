@@ -4,7 +4,7 @@ import {
   NoteType,
 } from '@ohos/game';
 import router from '@ohos.router';
-import { languageManager } from '@ohos/common';
+import { languageManager, themeManager, DarkAppearanceColors, LightAppearanceColors, DarkChartColors, LightChartColors } from '@ohos/common';
 import { ResultOverlay } from '../components/ResultOverlay';
 
 const LANE_COUNT: number = 4;
@@ -50,14 +50,27 @@ struct GamePage {
   @State endMaxCombo: number = 0;
   @State endBestScore: number = 0;
   @State endIsNewRecord: boolean = false;
+  @State appearanceMode: string = 'dark';
+  @State chartColorMode: string = 'dark';
 
   aboutToAppear(): void {
     this.currentLang = languageManager.getLanguage();
+    themeManager.init(getContext(this));
+    this.appearanceMode = themeManager.getAppearanceMode();
+    this.chartColorMode = themeManager.getChartColorMode();
   }
 
   private t(key: string): string {
     const _: string = this.currentLang;
     return languageManager.getText(key);
+  }
+
+  private chartColors() {
+    return this.chartColorMode === 'light' ? LightChartColors : DarkChartColors;
+  }
+
+  private appearanceColors() {
+    return this.appearanceMode === 'light' ? LightAppearanceColors : DarkAppearanceColors;
   }
 
   aboutToDisappear(): void {
@@ -80,12 +93,16 @@ struct GamePage {
   private startCountdown(): void {
     this.isCountdownActive = true;
     this.countdownDisplayText = '3';
+    this.drawStaticBackground();
     this.countdownTimerId = setTimeout(() => {
       this.countdownDisplayText = '2';
+      this.drawStaticBackground();
       this.countdownTimerId = setTimeout(() => {
         this.countdownDisplayText = '1';
+        this.drawStaticBackground();
         this.countdownTimerId = setTimeout(() => {
           this.countdownDisplayText = 'BEAT';
+          this.drawStaticBackground();
           this.countdownTimerId = setTimeout(() => {
             this.isCountdownActive = false;
             this.countdownDisplayText = '';
@@ -95,6 +112,32 @@ struct GamePage {
         }, 1000);
       }, 1000);
     }, 1000);
+  }
+
+  private drawStaticBackground(): void {
+    if (this.w === 0 || this.h === 0) {
+      return;
+    }
+    const c = this.ctx;
+    const colors = this.chartColors();
+    c.clearRect(0, 0, this.w, this.h);
+    c.fillStyle = colors.background;
+    c.fillRect(0, 0, this.w, this.h);
+    c.strokeStyle = colors.laneLine;
+    c.lineWidth = 1;
+    for (let i = 1; i < LANE_COUNT; i++) {
+      const x = i * this.laneW;
+      c.beginPath();
+      c.moveTo(x, 0);
+      c.lineTo(x, this.h);
+      c.stroke();
+    }
+    c.strokeStyle = colors.judgmentLine;
+    c.lineWidth = 3;
+    c.beginPath();
+    c.moveTo(0, this.judgY);
+    c.lineTo(this.w, this.judgY);
+    c.stroke();
   }
 
   private cancelCountdown(): void {
@@ -145,12 +188,13 @@ struct GamePage {
     }
 
     const c = this.ctx;
+    const colors = this.chartColors();
     c.clearRect(0, 0, this.w, this.h);
 
-    c.fillStyle = '#0D0D1A';
+    c.fillStyle = colors.background;
     c.fillRect(0, 0, this.w, this.h);
 
-    c.strokeStyle = '#333366';
+    c.strokeStyle = colors.laneLine;
     c.lineWidth = 1;
     for (let i = 1; i < LANE_COUNT; i++) {
       const x = i * this.laneW;
@@ -160,7 +204,7 @@ struct GamePage {
       c.stroke();
     }
 
-    c.strokeStyle = '#FFFFFF';
+    c.strokeStyle = colors.judgmentLine;
     c.lineWidth = 3;
     c.beginPath();
     c.moveTo(0, this.judgY);
@@ -181,11 +225,11 @@ struct GamePage {
       const y = n.currentY - NOTE_HEIGHT / 2;
 
       if (n.type === NoteType.TAP) {
-        c.fillStyle = '#00BFFF';
+        c.fillStyle = colors.tapNote;
       } else if (n.type === NoteType.HOLD) {
-        c.fillStyle = '#FF6B6B';
+        c.fillStyle = colors.holdNote;
       } else {
-        c.fillStyle = '#FFD700';
+        c.fillStyle = colors.slideNote;
       }
 
       c.globalAlpha = n.isJudged ? 0.3 : 1.0;
@@ -215,13 +259,13 @@ struct GamePage {
         Row() {
           Text(`${this.t('score_label')}: ${this.score}`)
             .fontSize(20)
-            .fontColor('#FFFFFF')
+            .fontColor(this.chartColors().scoreText)
             .fontWeight(FontWeight.Bold)
           Blank()
           if (this.combo > 1) {
             Text(`${this.combo}x`)
               .fontSize(24)
-              .fontColor('#FFD700')
+              .fontColor(this.chartColors().comboText)
               .fontWeight(FontWeight.Bold)
           }
         }
@@ -261,7 +305,7 @@ struct GamePage {
         ForEach(this.missEntries, (entry: MissEntry) => {
           Text('MISS')
             .fontSize(28)
-            .fontColor('#FF4500')
+            .fontColor(this.chartColors().missText)
             .fontWeight(FontWeight.Bold)
             .markAnchor({ x: '50%', y: '50%' })
             .position({
@@ -274,8 +318,10 @@ struct GamePage {
       if (!this.isEnded && !this.isCountdownActive) {
         Button(this.isPaused ? this.t('resume_label') : this.t('pause_label'))
           .fontSize(14)
-          .width(60)
           .height(32)
+          .padding({ left: 12, right: 12 })
+          .backgroundColor(this.chartColors().pauseBtnBg)
+          .fontColor(this.chartColors().pauseBtnText)
           .position({ x: 8, y: 40 })
           .onClick(() => {
             if (this.isPaused) {
@@ -293,12 +339,12 @@ struct GamePage {
           Column()
             .width('100%')
             .height('100%')
-            .backgroundColor('#80000000')
+            .backgroundColor('#80808080')
             .hitTestBehavior(HitTestMode.Block)
 
           Text(this.countdownDisplayText)
             .fontSize(72)
-            .fontColor('#FFFFFF')
+            .fontColor(this.chartColors().countdownText)
             .fontWeight(FontWeight.Bold)
             .textAlign(TextAlign.Center)
         }
@@ -313,9 +359,11 @@ struct GamePage {
           maxCombo: this.endMaxCombo,
           bestScore: this.endBestScore,
           isNewRecord: this.endIsNewRecord,
-          lang: this.currentLang
+          lang: this.currentLang,
+          chartColorMode: this.chartColorMode,
         })
       }
+
     }
     .width('100%')
     .height('100%')

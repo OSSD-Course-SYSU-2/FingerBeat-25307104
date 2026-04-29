@@ -276,7 +276,7 @@ App --> Player : 导航至游戏页
 
    a. 验收条件：[偏差 <= perfectWindow] → [PERFECT]；[偏差 <= greatWindow] → [GREAT]；[偏差 <= goodWindow] → [GOOD]；[偏差 > goodWindow] → [MISS]
 
-5. **评分计算**：分数 = 基础分(Perfect=300, Great=200, Good=100, Miss=0) x 连击倍率(10连=1.1x, 30连=1.2x, 50连=1.3x)
+5. **评分计算**：分数 = 基础分(Perfect=300, Great=200, Good=100, Miss=0) x 连击倍率(4+=1.1x, 8+=1.2x, 16+=1.3x, 32+=1.4x, 64+=1.5x)
 
    a. 验收条件：[获得判定] → [按公式计算分数增量并累加]
 

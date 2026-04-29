@@ -26,6 +26,11 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     'level_starry_melody': '星空旋律',
     'level_electro_pulse': '电子脉冲',
     'level_dream_beat': '梦幻节拍',
+    'settings_title': '设置',
+    'appearance_label': '外观模式',
+    'chart_color_label': '谱面颜色',
+    'dark_label': '深色',
+    'light_label': '浅色',
   },
   'en': {
     'app_name': 'FingerBeat',
@@ -48,6 +53,11 @@ const TRANSLATIONS: Record<string, Record<string, string>> = {
     'level_starry_melody': 'Starry Melody',
     'level_electro_pulse': 'Electro Pulse',
     'level_dream_beat': 'Dream Beat',
+    'settings_title': 'Settings',
+    'appearance_label': 'Appearance',
+    'chart_color_label': 'Chart Color',
+    'dark_label': 'Dark',
+    'light_label': 'Light',
   }
 };
 

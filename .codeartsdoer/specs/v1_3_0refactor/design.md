@@ -144,7 +144,7 @@ FingerBeat/
 
 **评分权重**：Perfect=300, Great=200, Good=100, Miss=0
 
-**连击倍率**：10连=1.1x, 30连=1.2x, 50连=1.3x
+**连击倍率**：4+=1.1x, 8+=1.2x, 16+=1.3x, 32+=1.4x, 64+=1.5x
 
 **字母评级**：S>=95%, A>=85%, B>=70%, C>=50%, D<50%
 
@@ -603,9 +603,11 @@ SCORE_WEIGHTS = { PERFECT: 300, GREAT: 200, GOOD: 100, MISS: 0 }
 
 // 连击倍率
 COMBO_MULTIPLIERS = [
-  { threshold: 50, multiplier: 1.3 },
-  { threshold: 30, multiplier: 1.2 },
-  { threshold: 10, multiplier: 1.1 },
+  { threshold: 64, multiplier: 1.5 },
+  { threshold: 32, multiplier: 1.4 },
+  { threshold: 16, multiplier: 1.3 },
+  { threshold: 8, multiplier: 1.2 },
+  { threshold: 4, multiplier: 1.1 },
 ]
 
 // 字母评级阈值
