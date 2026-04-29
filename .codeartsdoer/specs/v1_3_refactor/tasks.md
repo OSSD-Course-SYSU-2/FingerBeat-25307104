@@ -232,7 +232,7 @@
 2. 内部状态：score, combo, maxCombo, judgmentCounts
 3. 实现 `onJudgment(grade)`：
    - 计算基础分（Perfect=300, Great=200, Good=100, Miss=0）
-   - 计算连击倍率（10连=1.1x, 30连=1.2x, 50连=1.3x）
+   - 计算连击倍率（4+=1.1x, 8+=1.2x, 16+=1.3x, 32+=1.4x, 64+=1.5x）
    - 更新连击（非MISS: combo+1, MISS: combo=0）
    - 更新 maxCombo
    - 返回分数增量
