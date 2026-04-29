@@ -1,5 +1,5 @@
 import router from '@ohos.router';
-import { languageManager } from '@ohos/common';
+import { languageManager, DarkAppearanceColors, LightAppearanceColors } from '@ohos/common';
 
 @Component
 export struct ResultOverlay {
@@ -9,26 +9,27 @@ export struct ResultOverlay {
   @Prop bestScore: number = 0;
   @Prop isNewRecord: boolean = false;
   @Prop lang: string = 'zh';
-  @Prop primaryText: string = '#FFFFFF';
-  @Prop accentColor: string = '#FFD700';
-  @Prop secondaryText: string = '#AAAAAA';
-  @Prop overlayBackground: string = '#0D0D1A';
+  @Prop chartColorMode: string = 'dark';
 
   private t(key: string): string {
     const _: string = this.lang;
     return languageManager.getText(key);
   }
 
+  private colors() {
+    return this.chartColorMode === 'light' ? LightAppearanceColors : DarkAppearanceColors;
+  }
+
   build() {
     Column() {
       Text(this.t('result_title'))
         .fontSize(32)
-        .fontColor(this.primaryText)
+        .fontColor(this.colors().primaryText)
         .fontWeight(FontWeight.Bold)
         .margin({ bottom: 16 })
       Text(`${this.t('score_label')}: ${this.score}`)
         .fontSize(24)
-        .fontColor(this.accentColor)
+        .fontColor(this.colors().accent)
         .margin({ bottom: 8 })
       if (this.isNewRecord) {
         Text(this.t('new_record_full'))
@@ -39,21 +40,22 @@ export struct ResultOverlay {
       }
       Text(`${this.t('best_label')}: ${this.bestScore}`)
         .fontSize(20)
-        .fontColor(this.secondaryText)
+        .fontColor(this.colors().secondaryText)
         .margin({ bottom: 8 })
       Text(`${this.t('accuracy_label')}: ${this.accuracy.toFixed(1)}%`)
         .fontSize(20)
-        .fontColor(this.primaryText)
+        .fontColor(this.colors().primaryText)
         .margin({ bottom: 8 })
       Text(`${this.t('max_combo_label')}: ${this.maxCombo}`)
         .fontSize(20)
-        .fontColor(this.primaryText)
+        .fontColor(this.colors().primaryText)
         .margin({ bottom: 24 })
       Button(this.t('back'))
         .fontSize(18)
         .width('60%')
         .height(48)
-        .fontColor(this.primaryText)
+        .fontColor('#FFFFFF')
+        .backgroundColor(this.chartColorMode === 'dark' ? '#007DFF' : '#D4A800')
         .onClick(() => {
           router.back();
         })
@@ -61,6 +63,6 @@ export struct ResultOverlay {
     .width('100%')
     .height('100%')
     .justifyContent(FlexAlign.Center)
-    .backgroundColor(this.overlayBackground)
+    .backgroundColor(this.colors().background)
   }
 }

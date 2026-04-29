@@ -318,8 +318,8 @@ struct GamePage {
       if (!this.isEnded && !this.isCountdownActive) {
         Button(this.isPaused ? this.t('resume_label') : this.t('pause_label'))
           .fontSize(14)
-          .width(72)
           .height(32)
+          .padding({ left: 12, right: 12 })
           .backgroundColor(this.chartColors().pauseBtnBg)
           .fontColor(this.chartColors().pauseBtnText)
           .position({ x: 8, y: 40 })
@@ -360,10 +360,7 @@ struct GamePage {
           bestScore: this.endBestScore,
           isNewRecord: this.endIsNewRecord,
           lang: this.currentLang,
-          primaryText: this.appearanceColors().primaryText,
-          accentColor: this.appearanceColors().accent,
-          secondaryText: this.appearanceColors().secondaryText,
-          overlayBackground: this.appearanceColors().background,
+          chartColorMode: this.chartColorMode,
         })
       }
 

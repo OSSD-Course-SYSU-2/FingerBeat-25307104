@@ -43,7 +43,8 @@ struct Index {
           .fontSize(18)
           .width('60%')
           .height(48)
-          .fontColor(this.colors().primaryText)
+          .fontColor('#FFFFFF')
+          .backgroundColor(this.appearanceMode === 'dark' ? '#007DFF' : this.colors().accent)
           .onClick(() => {
             router.pushUrl({ url: 'pages/SongSelectPage' });
           })
@@ -53,33 +54,25 @@ struct Index {
       .justifyContent(FlexAlign.Center)
       .backgroundColor(this.colors().background)
 
-      LanguageSwitchButton()
+      LanguageSwitchButton({ textColor: this.colors().primaryText })
         .position({ x: 16, y: 16 })
 
       GearIconButton({
         iconColor: this.colors().primaryText,
         onGearClick: () => { this.showSettings = true; }
       })
-        .position({ x: '100%', y: 16 })
-        .translate({ x: -52 })
+        .position({ x: '88%', y: 16 })
 
       if (this.showSettings) {
         SettingsDialog({
-          appearanceMode: this.appearanceMode,
-          chartColorMode: this.chartColorMode,
+          appearanceMode: $appearanceMode,
+          chartColorMode: $chartColorMode,
           currentLang: this.currentLang,
-          primaryText: this.colors().primaryText,
-          dialogBackground: this.colors().background,
-          accentColor: this.colors().accent,
-          onAppearanceChange: (mode: string) => {
-            themeManager.setAppearanceMode(mode as 'dark' | 'light');
-            this.appearanceMode = mode;
-          },
-          onChartColorChange: (mode: string) => {
-            themeManager.setChartColorMode(mode as 'dark' | 'light');
-            this.chartColorMode = mode;
-          },
-          onClose: () => { this.showSettings = false; }
+          onClose: () => {
+            themeManager.setAppearanceMode(this.appearanceMode as 'dark' | 'light');
+            themeManager.setChartColorMode(this.chartColorMode as 'dark' | 'light');
+            this.showSettings = false;
+          }
         })
       }
     }
