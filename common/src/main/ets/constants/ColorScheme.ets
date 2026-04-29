@@ -37,7 +37,7 @@ export const DarkAppearanceColors: AppearanceColors = {
 };
 
 export const LightAppearanceColors: AppearanceColors = {
-  background: '#F5F5F5',
+  background: '#EDEDED',
   primaryText: '#1A1A2E',
   secondaryText: '#666666',
   divider: '#CCCCCC',

@@ -53,7 +53,8 @@ const LEVEL_LIST: LevelItem[] = [
   }
 ];
 
-const DIFFICULTY_COLORS: string[] = ['#00FF00', '#FFD700', '#FF4500'];
+const DIFFICULTY_COLORS_DARK: string[] = ['#00FF00', '#FFD700', '#FF4500'];
+const DIFFICULTY_COLORS_LIGHT: string[] = ['#2E8B57', '#C8960A', '#FF4500'];
 const DIFFICULTY_KEYS: string[] = ['difficulty_easy', 'difficulty_normal', 'difficulty_hard'];
 
 @Entry
@@ -78,6 +79,10 @@ struct SongSelectPage {
 
   private colors() {
     return this.appearanceMode === 'light' ? LightAppearanceColors : DarkAppearanceColors;
+  }
+
+  private diffColors(): string[] {
+    return this.appearanceMode === 'light' ? DIFFICULTY_COLORS_LIGHT : DIFFICULTY_COLORS_DARK;
   }
 
   private getLevelDescription(item: LevelItem): string {
@@ -113,13 +118,13 @@ struct SongSelectPage {
           ForEach([0, 1, 2], (idx: number) => {
             Text(this.t(DIFFICULTY_KEYS[idx]))
               .fontSize(14)
-              .fontColor(this.selectedDifficulty === idx ? '#0D0D1A' : DIFFICULTY_COLORS[idx])
+              .fontColor(this.selectedDifficulty === idx ? '#0D0D1A' : this.diffColors()[idx])
               .fontWeight(FontWeight.Bold)
               .padding({ left: 16, right: 16, top: 6, bottom: 6 })
               .borderRadius(4)
-              .backgroundColor(this.selectedDifficulty === idx ? DIFFICULTY_COLORS[idx] : '#00000000')
+              .backgroundColor(this.selectedDifficulty === idx ? this.diffColors()[idx] : '#00000000')
               .borderWidth(1)
-              .borderColor(DIFFICULTY_COLORS[idx])
+              .borderColor(this.diffColors()[idx])
               .margin({ left: idx === 0 ? 0 : 8, right: 0 })
               .onClick(() => {
                 this.selectedDifficulty = idx;
@@ -161,12 +166,12 @@ struct SongSelectPage {
 
                 Text(this.t(DIFFICULTY_KEYS[this.selectedDifficulty]))
                   .fontSize(12)
-                  .fontColor(DIFFICULTY_COLORS[this.selectedDifficulty])
+                  .fontColor(this.diffColors()[this.selectedDifficulty])
                   .fontWeight(FontWeight.Bold)
                   .padding({ left: 8, right: 8, top: 2, bottom: 2 })
                   .borderRadius(4)
                   .borderWidth(1)
-                  .borderColor(DIFFICULTY_COLORS[this.selectedDifficulty])
+                  .borderColor(this.diffColors()[this.selectedDifficulty])
                   .margin({ right: 8 })
 
                 Text('>')
