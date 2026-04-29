@@ -9,6 +9,5 @@
 /.clang-format
 /.clang-tidy
 **/.test
+/.preview
 /.appanalyzer
-/.arts
-/.codeartsdoer

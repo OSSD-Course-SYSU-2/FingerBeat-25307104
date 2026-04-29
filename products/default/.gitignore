@@ -3,11 +3,11 @@
 /local.properties
 /.idea
 /.preview
-/build
+**/build
 /.hvigor
 .cxx
 /.clangd
 /.clang-format
 /.clang-tidy
-/.test
+**/.test
 /.appanalyzer
