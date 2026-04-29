@@ -5,6 +5,42 @@ All notable changes to FingerBeat will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.1.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.3.2] - 2026-04-29
+
+### Added
+- Light/dark appearance mode for non-game pages (home, song select) with persisted preference
+- Light/dark chart color mode for game pages (gameplay, result) with persisted preference, independent from appearance mode
+- `ThemeManager` singleton for appearance/chart color preference management and persistence
+- `ColorScheme` constants: 4 color sets (DarkAppearanceColors, LightAppearanceColors, DarkChartColors, LightChartColors)
+- `GearIconButton` component (gearshape SVG icon) on home page and song select page (top-right corner)
+- `SettingsDialog` component (centered rounded-rect popup with semi-transparent overlay, × close button)
+- `RadioOption` component inside SettingsDialog (radio dot + label, blue dot when selected, bold text when selected)
+- Settings dialog with two labels: "外观模式"/"Appearance" and "谱面颜色"/"Chart Color", each with dark/light options
+- Eye-friendly light appearance palette: #EDEDED background, #1A1A2E primary text, #D4A800 accent
+- Light chart palette: #F0F0F0 background, #1A1A2E text, softer note colors for readability
+- Light mode difficulty colors: Easy=#2E8B57 (sea green), Normal=#C8960A (dark gold), Hard=#FF4500 (unchanged)
+- `onPageShow()` lifecycle on Index and SongSelectPage to sync theme state across page navigations
+- gearshape.svg resource in media assets
+
+### Changed
+- Result overlay now uses chart color mode for text/background and appearance mode for button color (dark chart → blue button, light chart → gold button)
+- Game page Canvas rendering now uses chart color scheme (background, lane lines, judgment line, notes, HUD)
+- Countdown overlay background changed from #80000000 (black 50%) to #80808080 (gray 128,128,128 50%)
+- Countdown now renders static background (track lines + judgment line) behind the semi-transparent overlay
+- Pause/Resume button width changed to padding-based auto-sizing for full text display
+- Home page "Ready to Beat" button: dark mode → blue (#007DFF) background, light mode → gold (#D4A800) background
+- LanguageSwitchButton now accepts `textColor` prop for appearance-aware coloring
+- Architecture section updated: `@ohos/common` now exports ThemeManager, ColorScheme, and color constants
+- .gitignore: added `/.preview`
+- .codeartsdoer: added DISCLAIMER.md; renamed v1_3_refactor → v1_3_0refactor
+
+### Fixed
+- Accuracy display in ResultOverlay: removed double percentage conversion (was `accuracy * 100`, now `accuracy.toFixed(1)`)
+- Settings dialog radio options now update reactively on selection (replaced @Builder with independent @Component RadioOption)
+- Settings dialog appearance/chart colors update in real-time when switching modes (using @Link binding)
+- Page appearance mode sync: returning from song select to home page now reflects appearance changes via onPageShow()
+- v1.3.0 spec/design/tasks documents corrected: combo multiplier thresholds fixed from (10/30/50) to (4/8/16/32/64)
+
 ## [1.3.1] - 2026-04-27
 
 ### Added

@@ -19,8 +19,10 @@
 - **音频引擎** — BGM播放 + SFX音效反馈
 - **双语国际化** — 中英双语界面实时切换，首页左上角语言切换按钮，语言偏好持久化
 - **3秒倒计时** — 进入游戏前显示 3 → 2 → 1 → BEAT 倒计时动画
-- **持久化存储** — 最高分和设置通过 HarmonyOS Preferences 保存
-- **深色模式** — 全局深色主题
+- **外观模式** — 深色/浅色外观切换（非游戏页面），护眼浅色配色，偏好持久化
+- **谱面颜色** — 深色/浅色谱面配色切换（游戏页面），与外观模式独立，偏好持久化
+- **设置弹窗** — 齿轮图标打开居中弹窗，圆点选中+粗体高亮，半透明遮罩
+- **持久化存储** — 最高分、设置、颜色模式偏好通过 HarmonyOS Preferences 保存
 - **响应式布局** — 适配手机、平板和二合一设备
 
 ### 关卡列表
@@ -39,12 +41,12 @@
 ```
 products/default (entry)     -- 应用壳，UI页面，资源
     ├── @ohos/game (HAR)     -- 游戏引擎核心
-    └── @ohos/common (HAR)   -- 共享工具、LanguageManager
+    └── @ohos/common (HAR)   -- 共享工具、LanguageManager、ThemeManager、ColorScheme
 
 features/game (HAR)          -- 游戏逻辑、模型、数据、引擎
     └── @ohos/common (HAR)
 
-common (HAR)                 -- Logger、BreakpointSystem、LanguageManager、常量
+common (HAR)                 -- Logger、BreakpointSystem、LanguageManager、ThemeManager、ColorScheme、常量
 ```
 
 #### 游戏引擎子系统
@@ -84,8 +86,8 @@ FingerBeat/
 ├── AppScope/                    # 应用级配置和资源
 ├── common/                      # @ohos/common HAR 模块
 │   └── src/main/ets/
-│       ├── constants/           # CommonConstants
-│       └── utils/               # Logger, BreakpointSystem, LanguageManager
+│       ├── constants/           # CommonConstants, ColorScheme
+│       └── utils/               # Logger, BreakpointSystem, LanguageManager, ThemeManager
 ├── features/
 │   └── game/                    # @ohos/game HAR 模块
 │       └── src/main/ets/
@@ -98,8 +100,8 @@ FingerBeat/
 │       └── src/main/
 │           ├── ets/             # UIAbility, 页面, 组件
 │           │   ├── pages/       # Index, SongSelectPage, GamePage
-│           │   └── components/  # LanguageSwitchButton, CountdownOverlay, ResultOverlay
-│           └── resources/       # i18n (en_US, zh_CN, base), 深色模式, rawfile (音频)
+│           │   └── components/  # LanguageSwitchButton, GearIconButton, SettingsDialog, ResultOverlay
+│           └── resources/       # i18n (en_US, zh_CN, base), 深色/浅色模式, rawfile (音频)
 ├── screenshots/                 # 应用截图
 ├── build-profile.json5          # 构建配置
 ├── oh-package.json5             # 包清单
@@ -110,8 +112,8 @@ FingerBeat/
 
 | 页面 | 路由 | 描述 |
 |------|------|------|
-| Index | `pages/Index` | 主菜单，显示应用标题和"开始击打！"按钮，左上角语言切换 |
-| SongSelectPage | `pages/SongSelectPage` | 曲目选择页，可滚动关卡列表 + EASY/NORMAL/HARD难度选择器 + 返回箭头 |
+| Index | `pages/Index` | 主菜单，显示应用标题和"开始击打！"按钮，左上角语言切换，右上角齿轮设置 |
+| SongSelectPage | `pages/SongSelectPage` | 曲目选择页，可滚动关卡列表 + EASY/NORMAL/HARD难度选择器 + 返回箭头 + 齿轮设置 |
 | GamePage | `pages/GamePage` | 游戏页面，3秒倒计时 + Canvas渲染 + HUD叠加层 + 结算画面 |
 
 ### 游戏常量
@@ -159,18 +161,20 @@ hvigorw testOhosTest
 
 ### 版本声明
 
-**当前版本：v1.3.1** (2026-04-27)
+**当前版本：v1.3.2** (2026-04-29)
 
 **本次更新亮点：**
-- 实现了中英双语界面实时切换（首页左上角语言切换按钮）
-- 进入游戏前增加3秒倒计时动画（3 → 2 → 1 → BEAT）
-- 首页背景统一为深色主题，结算页面全面支持双语显示
+- 新增外观模式（深色/浅色）与谱面颜色（深色/浅色）双独立颜色系统
+- 齿轮图标+设置弹窗支持实时切换，圆点选中+粗体高亮
+- 护眼浅色配色，倒计时遮罩改为中灰半透明并渲染游戏背景
+- 修复结算界面准确率双重百分比bug
 
 **项目当前核心能力：**
 - 音符自动下落与实时判定系统（v1.3.0 起）
 - 四级判定（PERFECT/GREAT/GOOD/MISS）与连击倍率（v1.3.0 起）
-- 音符生成：基于 Python 脚本预生成的固定四循环谱面（脚本位于项目根目录 gen_beatmaps.py）
+- 音符生成：基于 Python 脚本预生成的固定四循环谱面（脚本位于项目根目录 [gen_beatmaps.py](./gen_beatmaps.py)）
 - 中英双语界面、3秒倒计时（v1.3.1 起）
+- 外观模式/谱面颜色独立切换、设置弹窗（v1.3.2 起）
 
 **已知限制：**
 - "开始演奏！"模式尚未完整实现（计划于 v1.6.x 完成）
@@ -245,8 +249,10 @@ A rhythm game built for HarmonyOS. Tap the notes to the beat and aim for the hig
 - **Audio Engine** — BGM playback with SFX sound pool for hit/miss feedback
 - **Bilingual i18n** — Chinese/English real-time UI switching via LanguageManager, language preference persisted
 - **3-Second Countdown** — Countdown overlay (3 → 2 → 1 → BEAT) before game starts
-- **Persistent Storage** — Best scores and settings saved via HarmonyOS Preferences
-- **Dark Mode** — Full dark theme support
+- **Appearance Mode** — Dark/light appearance switching (non-game pages), eye-friendly light palette, preference persisted
+- **Chart Color** — Dark/light chart color switching (game pages), independent from appearance mode, preference persisted
+- **Settings Dialog** — Gear icon opens centered popup, radio dot selection + bold highlight, semi-transparent overlay
+- **Persistent Storage** — Best scores, settings, and color mode preferences saved via HarmonyOS Preferences
 - **Responsive Layout** — Adaptive breakpoint system for phone, tablet, and 2-in-1 devices
 
 ### Level List
@@ -270,7 +276,7 @@ products/default (entry)     -- App shell, UI pages, resources
 features/game (HAR)          -- Game logic, models, data, engine
     └── @ohos/common (HAR)
 
-common (HAR)                 -- Logger, BreakpointSystem, LanguageManager, constants
+common (HAR)                 -- Logger, BreakpointSystem, LanguageManager, ThemeManager, ColorScheme, constants
 ```
 
 #### Game Engine Subsystems
@@ -310,8 +316,8 @@ FingerBeat/
 ├── AppScope/                    # App-level config and resources
 ├── common/                      # @ohos/common HAR module
 │   └── src/main/ets/
-│       ├── constants/           # CommonConstants
-│       └── utils/               # Logger, BreakpointSystem, LanguageManager
+│       ├── constants/           # CommonConstants, ColorScheme
+│       └── utils/               # Logger, BreakpointSystem, LanguageManager, ThemeManager
 ├── features/
 │   └── game/                    # @ohos/game HAR module
 │       └── src/main/ets/
@@ -324,8 +330,8 @@ FingerBeat/
 │       └── src/main/
 │           ├── ets/             # UIAbility, pages, components
 │           │   ├── pages/       # Index, SongSelectPage, GamePage
-│           │   └── components/  # LanguageSwitchButton, CountdownOverlay, ResultOverlay
-│           └── resources/       # i18n (en_US, zh_CN, base), dark mode, rawfile (audio)
+│           │   └── components/  # LanguageSwitchButton, GearIconButton, SettingsDialog, ResultOverlay
+│           └── resources/       # i18n (en_US, zh_CN, base), dark/light mode, rawfile (audio)
 ├── screenshots/                 # App screenshots
 ├── build-profile.json5          # Build configuration
 ├── oh-package.json5             # Package manifest
@@ -336,8 +342,8 @@ FingerBeat/
 
 | Page | Route | Description |
 |------|-------|-------------|
-| Index | `pages/Index` | Main menu with app title, "Ready to Beat" button, and language switch |
-| SongSelectPage | `pages/SongSelectPage` | Song selection page with scrollable level list + EASY/NORMAL/HARD difficulty selector + back arrow |
+| Index | `pages/Index` | Main menu with app title, "Ready to Beat" button, language switch, and gear settings icon |
+| SongSelectPage | `pages/SongSelectPage` | Song selection page with scrollable level list + EASY/NORMAL/HARD difficulty selector + back arrow + gear settings icon |
 | GamePage | `pages/GamePage` | Game play page with 3-second countdown, Canvas rendering, HUD overlay, and result screen |
 
 ### Game Constants
@@ -385,18 +391,20 @@ hvigorw testOhosTest
 
 ### Version Statement
 
-**Current Version: v1.3.1** (2026-04-27)
+**Current Version: v1.3.2** (2026-04-29)
 
 **Highlights of this update:**
-- Implemented Chinese/English bilingual real-time UI switching (language switch button at top-left corner of home page)
-- Added 3-second countdown animation before game starts (3 → 2 → 1 → BEAT)
-- Unified home page background to dark theme, result screen fully supports bilingual display
+- New appearance mode (dark/light) and chart color mode (dark/light) dual independent color system
+- Gear icon + settings dialog with real-time switching, radio dot selection + bold highlight
+- Eye-friendly light palette, countdown overlay changed to mid-gray semi-transparent with game background rendered
+- Fixed accuracy double percentage bug in result screen
 
 **Current core capabilities:**
 - Note auto-fall and real-time judgment system (since v1.3.0)
 - Four-grade judgment (PERFECT/GREAT/GOOD/MISS) with combo multipliers (since v1.3.0)
-- Note generation: Pre-generated fixed 4-cycle beatmaps via Python script (located at project root gen_beatmaps.py)
+- Note generation: Pre-generated fixed 4-cycle beatmaps via Python script (located at project root [gen_beatmaps.py](./gen_beatmaps.py))
 - Bilingual UI (Chinese/English), 3-second countdown (since v1.3.1)
+- Appearance mode / chart color independent switching, settings dialog (since v1.3.2)
 
 **Known limitations:**
 - "Beat It Yourself" mode not yet fully implemented (planned for v1.6.x)
