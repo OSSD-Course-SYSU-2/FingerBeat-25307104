@@ -16,6 +16,14 @@ struct Index {
   aboutToAppear(): void {
     languageManager.init(getContext(this));
     themeManager.init(getContext(this));
+    this.syncFromManager();
+  }
+
+  onPageShow(): void {
+    this.syncFromManager();
+  }
+
+  private syncFromManager(): void {
     this.currentLang = languageManager.getLanguage();
     this.appearanceMode = themeManager.getAppearanceMode();
     this.chartColorMode = themeManager.getChartColorMode();

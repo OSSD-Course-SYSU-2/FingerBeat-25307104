@@ -67,6 +67,14 @@ struct SongSelectPage {
   @State showSettings: boolean = false;
 
   aboutToAppear(): void {
+    this.syncFromManager();
+  }
+
+  onPageShow(): void {
+    this.syncFromManager();
+  }
+
+  private syncFromManager(): void {
     this.currentLang = languageManager.getLanguage();
     this.appearanceMode = themeManager.getAppearanceMode();
     this.chartColorMode = themeManager.getChartColorMode();
